@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>SHIFT — MyBlackCloud</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/game.css">
+</head>
+<body class="paused">
+<div id="app">
+  <button id="menuToggle" type="button" aria-controls="desktopMenu" aria-expanded="false" aria-label="Open shift menu">☰</button>
+  <button id="menuBackdrop" type="button" aria-label="Close shift menu" hidden></button>
+  <aside id="desktopMenu" aria-label="Shift controls">
+    <div class="desktopBrand"><span>SHIFT <small>ICU</small></span></div>
+    <section class="accountPanel" aria-label="Your account">
+      <p id="accountStatus" role="status">Checking access…</p>
+      <a id="signInLink" href="/auth/login?redirect=%2Fgame" target="_top">YOUR ACCOUNT · SIGN IN / SIGN UP</a>
+      <a id="unlockLink" href="/" target="_top">UNLOCK ALL LEVELS →</a>
+      <button id="refreshAccess" type="button">Refresh access</button>
+    </section>
+    <p class="desktopEyebrow"><span>SHIFT DIRECTORY</span><span>01 — 08</span></p>
+    <nav id="levelSelect" aria-label="Level selection"></nav>
+    <p id="levelSummary" aria-live="polite"></p>
+    <button id="startLevelBtn" type="button">START LEVEL 1</button>
+    <p class="desktopHint">Starts a fresh level with your selected badge.</p>
+    <button id="logoutBtn" type="button" disabled>LOG OUT</button>
+    <div class="desktopKeys"><kbd>WASD</kbd> / <kbd>↑ ↓ ← →</kbd> move · <kbd>SPACE</kbd> act</div>
+  </aside>
+  <div id="hud">
+    <div id="hudTop">
+      <div id="lvl">LEVEL 1</div><div class="sp"></div>
+      <div id="energy"><span class="cap">ENERGY<em id="gear">FULL</em></span><i><b></b></i></div>
+      <button id="mute" title="sound">♪</button>
+      <div class="kv" id="kScore">COINS <b>0</b></div>
+      <div class="kv" id="kSaved">OUT <b>0</b></div>
+    </div>
+    <div id="evtray"></div>
+    <div id="strip"></div>
+    <div id="detail"></div>
+  </div>
+  <div id="stage">
+    <canvas id="cv"></canvas>
+    <div id="log">One bed. How hard can it be.</div>
+    <div id="evt"></div>
+    <div id="packRow"><span class="cap">PACK</span><span id="slots">0 / 6</span></div>
+    <div id="stickZone"><div id="stick"><div id="knob"></div></div></div>
+    <div id="shop"><div id="shopBox"></div></div>
+    <div id="powers"></div>
+    <div id="actBtn">ACT</div>
+  </div>
+  <div id="ov">
+    <h1>SHIFT</h1>
+    <p class="k">One fanny pack. An ICU that hides everything.</p>
+    <p>Pick your badge below. The <b style="color:var(--spo2);font-weight:500">RT</b> works airways, oxygen and ventilators. The <b style="color:#E8ECEF;font-weight:500">RN</b> works lines, drugs, drains and skin — different bag, different patients, same shift.</p>
+    <p>At the vending machine you can buy <b style="color:#C9A227;font-weight:500">two more pack slots</b> (six becomes eight) and <b style="color:#38D6E0;font-weight:500">deeper reserves</b> (half again as much energy). Both are permanent.</p>
+    <p>Every patient has a <b style="color:var(--spo2);font-weight:500">drop zone</b> beside the bed — the hatched square. Stand on it and <b style="color:var(--text);font-weight:500">hold ACT</b> to unload whatever they need.</p>
+    <p>Delivering a full step drops their <b style="color:var(--crit);font-weight:500">care needs</b> by one and buys back clock — but they aren't done yet. A new step appears with new tools.</p>
+    <p>Empty the care bar and the bed flags <b style="color:var(--hr);font-weight:500">CHAIR</b>. Grab a wheelchair from the bay, load him at the bedside, wheel him down to the waiting room and stand on <b style="color:var(--hr);font-weight:500">EXIT</b>. Only then is the bed free for the next admit — and don't dawdle, a patient left waiting on his ride will relapse and drop back into care.</p>
+    <p>Night shift left <b style="color:#C8974E;font-weight:500">four rooms soiled</b>. Nobody can be admitted to a soiled room, so haul the dirty equipment to the four bays in dirty utility. Fill all four and you get a full tank and thirty seconds of sprint.</p>
+    <p>The lunch room has coffee — hold ACT there to refill. <b style="color:#8FE04A;font-weight:500">Energy cans</b> found on the unit go straight to your power rail; tap one anywhere. There are four: <b style="color:#4A9CE0;font-weight:500">blue</b> 25%, <b style="color:#8FE04A;font-weight:500">green</b> 50%, <b style="color:#F2A03D;font-weight:500">amber</b> 75%, <b style="color:#C96BD8;font-weight:500">violet</b> a full tank. Cheap ones early, better ones later — but a violet can turn up any time. The streak behind you matches whatever you drank.</p>
+    <p>Once a patient's first care step lands, the unit starts throwing <b style="color:#B48CE0;font-weight:500">black clouds</b> at you until they're discharged — freak events, at random. A power bump drops the lights and leaves you on a flashlight until a quarter of your tank burns off. A birthday party in the lunch room needs you there before the timer runs out. And "Hey RT" is exactly what it sounds like.</p>
+    <p>You get <b style="color:#B48CE0;font-weight:500">one black cloud per level</b> — it might be a power bump, a birthday party, or every soul on the unit deciding they need you at once. Ride one out and you earn <b style="color:#F2C94D;font-weight:500">coins</b> — more for the hard ones. Spend them at the vending machine in the lunch room.</p>
+    <p>Tap ACT to pick up a tool you're standing on. Dirty utility, bottom right, dumps your whole pack — hold ACT there too. Staff drift around the unit; you can push through them, but a crowd drags you to a crawl.</p>
+    <p>If a patient codes, find the crash cart and get it to their drop zone. Everyone shows up for a code. That's the problem.</p>
+    <div id="roles">
+      <button class="role sel" data-role="RT"><b>RT</b><span>Respiratory Therapist</span></button>
+      <button class="role" data-role="RN"><b>RN</b><span>Registered Nurse</span></button>
+    </div>
+    <button id="startBtn">CLOCK IN</button>
+
+  </div>
+</div>
+
+<script src="assets/js/game.js"></script>
+</body>
+</html>
