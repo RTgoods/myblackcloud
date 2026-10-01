@@ -46,29 +46,8 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
 
   return (
     <>
-      {!open && (
-        <button
-          onClick={() => setOpen(true)}
-          aria-label="Open menu"
-          aria-expanded={open}
-          className="md:hidden fixed top-3 left-3 z-50 w-9 h-9 rounded-md"
-          style={{ background: '#0b1420', border: '1px solid #1c3a42', color: '#38D6E0', fontSize: 18 }}
-        >
-          ☰
-        </button>
-      )}
-
-      {open && (
-        <button
-          onClick={close}
-          aria-label="Close menu"
-          className="md:hidden fixed inset-0 z-40"
-          style={{ background: 'rgba(0,0,0,0.6)', border: 'none' }}
-        />
-      )}
-
       <aside
-        className={`fixed md:sticky top-0 left-0 h-screen z-50 md:z-auto flex flex-col shrink-0 transition-all duration-200 overflow-y-auto ${open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
+        className="sticky top-0 left-0 h-screen flex flex-col shrink-0 transition-all duration-200 overflow-y-auto"
         style={{
           width: open ? 264 : 56,
           background: 'linear-gradient(180deg,#0b1420,#06090c 42%)',
