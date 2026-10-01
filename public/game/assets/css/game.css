@@ -627,7 +627,12 @@ body.embedded #hudTop{padding-left:0}
 @media (max-width:767px){
   html,body{position:fixed;inset:0;height:100%;height:100dvh;min-height:100svh;overflow:hidden;touch-action:none;overscroll-behavior:none}
   #app{height:100%;height:100dvh;min-height:100svh;overflow:hidden;touch-action:none}
-  #desktopMenu{padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+  /* Full-screen takeover on mobile — no sliver of the play field left
+     exposed beside the drawer for the pack/power/stick/act controls to
+     show (or be tapped) through. */
+  #desktopMenu{width:100%;padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+  .menuOpen #packRow,.menuOpen #powers,.menuOpen #stickZone,.menuOpen #actBtn,
+  .menuOpen #evt,.menuOpen #evtray{display:none}
   #hudTop{padding-left:0}
   #menuToggle{position:relative;top:auto;left:auto;flex:0 0 32px}
   #packRow{bottom:calc(env(safe-area-inset-bottom) + 232px)}
