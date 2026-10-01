@@ -610,3 +610,16 @@ body.embedded #menuToggle,
 body.embedded #desktopMenu,
 body.embedded #menuBackdrop{display:none!important}
 body.embedded #hudTop{padding-left:0}
+
+@media (max-width:360px){
+  #hudTop{gap:4px}
+  #lvl{font-size:14px;letter-spacing:.06em}
+  #energy{min-width:68px}
+  #energy .cap{font-size:6.5px;letter-spacing:.12em}
+  .kv{font-size:6px;letter-spacing:.1em}
+  .kv b{font-size:14px}
+}
+
+@media (max-width:767px) and (max-height:720px){
+  #packRow{grid-template-columns:repeat(2,35px)}
+}
