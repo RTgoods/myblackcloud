@@ -13,7 +13,7 @@ export default async function PlayPage({
   const level = parseLevel((await searchParams).level)
 
   return (
-    <div className="h-screen w-full bg-black">
+    <div className="h-dvh w-full overflow-hidden bg-black">
       <iframe
         src={`/game/index.html?level=${level}&embed=1`}
         title="SHIFT"

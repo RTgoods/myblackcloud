@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { Sidebar } from "@/components/Sidebar";
-import { ConditionalFooter } from "@/components/ConditionalFooter";
+import { MainContent } from "@/components/MainContent";
 import { createClient } from "@/lib/supabase/server";
 import { gameAccess } from "@/lib/game-access";
 import "./globals.css";
@@ -60,10 +60,7 @@ export default async function RootLayout({
             isAdmin={access?.isAdmin ?? false}
             completedLevels={completedLevels}
           />
-          <div className="flex-1 min-w-0 pt-14 md:pt-0">
-            {children}
-            <ConditionalFooter />
-          </div>
+          <MainContent>{children}</MainContent>
         </div>
         <Analytics />
       </body>
