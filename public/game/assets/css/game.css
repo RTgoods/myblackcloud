@@ -604,9 +604,10 @@ kbd{font:inherit;color:#DBE8ED}
 #logoutBtn:not(:disabled):hover{background:#0d1b20;border-color:#38D6E0}
 #logoutBtn[hidden]{display:none}
 
-/* Embedded in /play — the site's own floating trigger is suppressed there
-   (it would sit right on top of this one), so this hamburger + its menu
-   is the only shift menu on screen and must stay fully usable. */
+/* The parent site's sidebar owns navigation when the game is embedded. */
+body.embedded #menuToggle,
+body.embedded #desktopMenu,
+body.embedded #menuBackdrop{display:none!important}
 body.embedded #hudTop{padding-left:0}
 
 @media (max-width:360px){

@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { SignOutButton } from './SignOutButton'
 import rtMale from '../../public/images/characters/rt-male-face.webp'
@@ -34,11 +33,6 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
   const portrait = PORTRAITS[role][gender]
   const [open, setOpen] = useState(true)
   const close = () => setOpen(false)
-  // The embedded game on /play has its own hamburger sitting right next to its
-  // own "LEVEL N" label, in the same top-left corner — showing the site's
-  // floating trigger there too just overlaps it with a second, redundant one.
-  const pathname = usePathname()
-  const onPlayPage = pathname?.startsWith('/play') ?? false
   // Dismiss the overlay drawer on mobile after navigating, but leave the
   // persistent desktop sidebar exactly as it was — it must not collapse
   // just because a nav link was clicked.
@@ -52,7 +46,7 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
 
   return (
     <>
-      {!open && !onPlayPage && (
+      {!open && (
         <button
           onClick={() => setOpen(true)}
           aria-label="Open menu"
