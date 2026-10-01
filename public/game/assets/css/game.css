@@ -625,9 +625,11 @@ body.embedded #hudTop{padding-left:0}
 }
 
 @media (max-width:767px){
-  html,body{height:100%;height:100dvh;min-height:100svh}
-  #app{height:100%;height:100dvh;min-height:100svh}
+  html,body{inset:0;height:100%;height:100dvh;min-height:100svh;overflow:hidden;touch-action:none}
+  #app{height:100%;height:100dvh;min-height:100svh;overflow:hidden;touch-action:none}
   #desktopMenu{padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+  #hudTop{padding-left:0}
+  #menuToggle{position:relative;top:auto;left:auto;flex:0 0 32px}
   #packRow{bottom:calc(env(safe-area-inset-bottom) + 232px)}
   #powers{bottom:calc(env(safe-area-inset-bottom) + 168px)}
   #stickZone{bottom:calc(env(safe-area-inset-bottom) + 38px)}

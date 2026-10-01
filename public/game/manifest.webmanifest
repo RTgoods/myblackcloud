@@ -1,0 +1,8 @@
+{
+  "name": "SHIFT — MyBlackCloud",
+  "short_name": "SHIFT",
+  "start_url": "/game/index.html",
+  "display": "standalone",
+  "background_color": "#06090c",
+  "theme_color": "#06090c"
+}
