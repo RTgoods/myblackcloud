@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { SignOutButton } from './SignOutButton'
+import type { LevelStat } from '@/types/database'
 import rtMale from '../../public/images/characters/rt-male-face.webp'
 import rtFemale from '../../public/images/characters/rt-female-face.webp'
 import nurseMale from '../../public/images/characters/nurse-male-face.webp'
@@ -11,6 +12,13 @@ import nurseFemale from '../../public/images/characters/nurse-female-face.webp'
 
 type Role = 'RT' | 'RN'
 type Gender = 'male' | 'female'
+
+function formatLevelDuration(seconds: number | undefined) {
+  if (seconds === undefined) return 'Not recorded'
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = seconds % 60
+  return `${minutes}:${String(remainingSeconds).padStart(2, '0')}`
+}
 
 const PORTRAITS: Record<Role, Record<Gender, typeof rtMale>> = {
   RT: { male: rtMale, female: rtFemale },
@@ -25,10 +33,15 @@ interface Props {
   unlocked: boolean
   isAdmin?: boolean
   completedLevels?: number[]
+  levelStats?: Record<string, LevelStat>
 }
 
-export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', unlocked, isAdmin = false, completedLevels = [] }: Props) {
-  const isLevelUnlocked = (n: number) => n === 1 || isAdmin || (unlocked && completedLevels.includes(n - 1))
+export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', unlocked, isAdmin = false, completedLevels = [], levelStats = {} }: Props) {
+  const [savedCompletedLevels, setSavedCompletedLevels] = useState(completedLevels)
+  const [savedLevelStats, setSavedLevelStats] = useState(levelStats)
+  const [expandedLevel, setExpandedLevel] = useState<number | null>(1)
+  const isLevelUnlocked = (n: number) => n === 1 || ((isAdmin || unlocked) &&
+    Array.from({ length: n - 1 }, (_, index) => index + 1).every((previous) => savedCompletedLevels.includes(previous)))
   const name = handle?.trim() || email?.split('@')[0] || null
   const portrait = PORTRAITS[role][gender]
   const [open, setOpen] = useState(true)
@@ -42,7 +55,35 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
 
   useEffect(() => {
     if (window.matchMedia('(max-width: 767px)').matches) setOpen(false)
+    const routeLevel = Number(new URLSearchParams(window.location.search).get('level'))
+    if (routeLevel >= 1 && routeLevel <= 8) setExpandedLevel(routeLevel)
   }, [])
+
+  useEffect(() => {
+    if (!email) return
+    let active = true
+    const refreshProgress = async () => {
+      try {
+        const response = await fetch('/api/progress', { cache: 'no-store' })
+        if (!response.ok) return
+        const progress = await response.json()
+        if (!active) return
+        setSavedCompletedLevels(Array.isArray(progress.completedLevels) ? progress.completedLevels : [])
+        setSavedLevelStats(progress.levelStats && typeof progress.levelStats === 'object' ? progress.levelStats : {})
+      } catch {}
+    }
+    const onMessage = (event: MessageEvent) => {
+      if (event.origin === window.location.origin && event.data?.type === 'shift-progress-saved') void refreshProgress()
+    }
+    window.addEventListener('focus', refreshProgress)
+    window.addEventListener('message', onMessage)
+    void refreshProgress()
+    return () => {
+      active = false
+      window.removeEventListener('focus', refreshProgress)
+      window.removeEventListener('message', onMessage)
+    }
+  }, [email])
 
   return (
     <>
@@ -135,26 +176,100 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
             </nav>
 
             <div className="mt-4 pt-4" style={{ borderTop: '1px solid #163040' }}>
-              <p className="mb-2 text-[10px] font-black uppercase tracking-[2px]" style={{ color: '#5c6d7a' }}>Shift Directory</p>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="mb-2 flex items-center justify-between text-[10px] font-black uppercase tracking-[2px]" style={{ color: '#5c6d7a' }}>
+                <span>Shift Directory</span>
+                <span>01 - 08</span>
+              </div>
+              <div>
                 {Array.from({ length: 8 }, (_, i) => i + 1).map((n) => {
                   const playable = isLevelUnlocked(n)
+                  const completed = savedCompletedLevels.includes(n)
+                  const expanded = expandedLevel === n
+                  const firstIncompletePriorLevel = Array.from({ length: n - 1 }, (_, index) => index + 1)
+                    .find((previous) => !savedCompletedLevels.includes(previous))
+                  const stats = savedLevelStats[String(n)]
                   return (
-                    <Link
-                      key={n}
-                      href={`/play?level=${n}`}
-                      onClick={closeOnMobile}
-                      aria-label={`Launch Level ${n}`}
-                      className="flex items-center justify-center rounded-[4px] text-[11px] font-black"
-                      style={{
-                        height: 32,
-                        color: playable ? '#38D6E0' : '#5c6d7a',
-                        border: '1px solid #1c3a42',
-                        background: '#081019',
-                      }}
-                    >
-                      {n}
-                    </Link>
+                    <section key={n} className="border-b border-[#163040]">
+                      <button
+                        type="button"
+                        aria-expanded={expanded}
+                        aria-controls={`level-details-${n}`}
+                        onClick={() => setExpandedLevel(expanded ? null : n)}
+                        className="flex min-h-[66px] w-full items-center gap-3 py-2 text-left"
+                      >
+                        <span
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] border text-sm font-black"
+                          style={{
+                            color: completed ? '#F2C94D' : playable ? '#38D6E0' : '#5c6d7a',
+                            borderColor: completed ? '#806B24' : '#1c3a42',
+                            background: '#081019',
+                          }}
+                        >
+                          {completed ? '✓' : `S${n}`}
+                        </span>
+                        <span className="flex min-w-0 flex-1 flex-col gap-1">
+                          <span className="text-[11px] font-black uppercase tracking-[2px]" style={{ color: completed ? '#F2C94D' : playable ? '#38D6E0' : '#5c6d7a' }}>
+                            {completed ? 'Cleared' : `Level ${n}`}
+                          </span>
+                          <span className="text-[11px] font-bold uppercase tracking-[1px]" style={{ color: completed ? '#b99d35' : playable ? '#dfeaf4' : '#657485' }}>
+                            {completed ? `Shift ${n} complete` : playable ? 'Ready to play' : firstIncompletePriorLevel ? `Clear level ${firstIncompletePriorLevel} first` : 'Unlock full shift'}
+                          </span>
+                        </span>
+                        <span aria-hidden="true" className="text-lg" style={{ color: playable ? '#9eaab0' : '#5c6d7a' }}>{expanded ? '⌄' : '›'}</span>
+                      </button>
+
+                      {expanded && (
+                        <div id={`level-details-${n}`} className="pb-3 pl-[52px] pr-1">
+                          {completed && stats ? (
+                            <>
+                              <div className="grid grid-cols-2 gap-x-3 gap-y-2">
+                                <div>
+                                  <p className="text-[9px] font-bold uppercase tracking-[1.5px]" style={{ color: '#5c6d7a' }}>Score</p>
+                                  <p className="mt-1 text-[11px] font-bold" style={{ color: '#dfeaf4' }}>{stats.totalDischarged} discharged</p>
+                                </div>
+                                <div>
+                                  <p className="text-[9px] font-bold uppercase tracking-[1.5px]" style={{ color: '#5c6d7a' }}>Time</p>
+                                  <p className="mt-1 text-[11px] font-bold" style={{ color: '#dfeaf4' }}>{formatLevelDuration(stats.durationSeconds)}</p>
+                                </div>
+                                <div>
+                                  <p className="text-[9px] font-bold uppercase tracking-[1.5px]" style={{ color: '#5c6d7a' }}>Coins earned</p>
+                                  <p className="mt-1 text-[11px] font-bold" style={{ color: '#dfeaf4' }}>{stats.coinsEarned ?? 'Not recorded'}</p>
+                                </div>
+                              </div>
+                              <div className="mt-3">
+                                <p className="text-[9px] font-bold uppercase tracking-[1.5px]" style={{ color: '#5c6d7a' }}>Favorite tools</p>
+                                {stats.favoriteTools?.length ? (
+                                  <ol className="mt-1 space-y-1">
+                                    {stats.favoriteTools.slice(0, 3).map((tool) => (
+                                      <li key={tool.name} className="flex justify-between gap-2 text-[10px]" style={{ color: '#9eaab0' }}>
+                                        <span className="truncate">{tool.name}</span>
+                                        <span className="shrink-0">{tool.uses}x</span>
+                                      </li>
+                                    ))}
+                                  </ol>
+                                ) : <p className="mt-1 text-[10px]" style={{ color: '#81909c' }}>Not recorded</p>}
+                              </div>
+                            </>
+                          ) : completed ? (
+                            <p className="text-[10px] leading-5" style={{ color: '#81909c' }}>Detailed results are available for levels completed after this update.</p>
+                          ) : !playable ? (
+                            <p className="text-[10px] leading-5" style={{ color: '#81909c' }}>
+                              {firstIncompletePriorLevel ? `Complete level ${firstIncompletePriorLevel} before this shift.` : 'Unlock the full shift to play this level.'}
+                            </p>
+                          ) : null}
+                          {playable && (
+                            <Link
+                              href={`/play?level=${n}`}
+                              onClick={closeOnMobile}
+                              className="mt-3 flex min-h-10 w-full items-center justify-center rounded-[3px] border text-[10px] font-black uppercase tracking-[2px]"
+                              style={{ color: '#06090c', background: '#38D6E0', borderColor: '#38D6E0' }}
+                            >
+                              {completed ? 'Replay level' : 'Play level'}
+                            </Link>
+                          )}
+                        </div>
+                      )}
+                    </section>
                   )
                 })}
               </div>

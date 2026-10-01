@@ -3,7 +3,13 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { gameAccess } from '@/lib/game-access'
 import { progressLimiter, checkLimit } from '@/lib/rate-limit'
-import { isValidLevel, isValidTotalDischarged } from '@/lib/progress-validation'
+import {
+  isValidCoinsEarned,
+  isValidDurationSeconds,
+  isValidFavoriteTools,
+  isValidLevel,
+  isValidTotalDischarged,
+} from '@/lib/progress-validation'
 import type { LevelStat } from '@/types/database'
 
 // GET /api/progress — return completed levels + stats for the current user
@@ -39,15 +45,32 @@ export async function POST(req: NextRequest) {
     level: number
     totalDischarged?: number
     resetVersion?: number
+    durationSeconds?: number
+    coinsEarned?: number
+    favoriteTools?: { name: string; uses: number }[]
   }
   const { level, totalDischarged = 0, resetVersion = 0 } = body
 
   if (!isValidLevel(level)) return NextResponse.json({ error: 'Invalid level' }, { status: 400 })
   if (!Number.isInteger(resetVersion) || resetVersion < 0) return NextResponse.json({ error: 'Invalid reset version' }, { status: 400 })
   if (!isValidTotalDischarged(totalDischarged)) return NextResponse.json({ error: 'Invalid stats' }, { status: 400 })
+  const hasMetrics = body.durationSeconds !== undefined || body.coinsEarned !== undefined || body.favoriteTools !== undefined
+  if (hasMetrics && (
+    !isValidDurationSeconds(body.durationSeconds) ||
+    !isValidCoinsEarned(body.coinsEarned) ||
+    !isValidFavoriteTools(body.favoriteTools)
+  )) return NextResponse.json({ error: 'Invalid level stats' }, { status: 400 })
   if (level > 1 && !access.allowed) return NextResponse.json({ error: 'Purchase required' }, { status: 403 })
 
-  const stat: LevelStat = { totalDischarged, completedAt: new Date().toISOString() }
+  const stat: LevelStat = {
+    totalDischarged,
+    completedAt: new Date().toISOString(),
+    ...(hasMetrics ? {
+      durationSeconds: body.durationSeconds,
+      coinsEarned: body.coinsEarned,
+      favoriteTools: body.favoriteTools,
+    } : {}),
+  }
   const { data, error } = await createAdminClient().rpc('save_level_progress', {
     p_user_id: user.id, p_level: level, p_stat: stat,
     p_reset_version: resetVersion, p_is_admin: access.isAdmin,

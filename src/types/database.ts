@@ -21,6 +21,9 @@ export type Profile = {
 export type LevelStat = {
   totalDischarged: number
   completedAt: string
+  durationSeconds?: number
+  coinsEarned?: number
+  favoriteTools?: { name: string; uses: number }[]
 }
 
 export type Progress = {

@@ -271,6 +271,8 @@ let seated=[], reception=null, cleaners=[], pacers=[], gazers=[], birth=null, de
 let chat=null, chatT=5, chatSaid=[];
 let blackout=0, blackoutFrom=0, preFlick=0, postFlick=0, eventName="", eventT=0;
 let events=[], evRoll=0, coins=0, partyP=0, dance=0, streamers=[], banner="", bannerT=0, bannerKind="";
+let levelCoinsEarned=0, levelToolUses={};
+function awardCoins(amount){coins+=amount;levelCoinsEarned+=amount;}
 let cloudUsed=false, swarm=0, shouts=[];
 let powers=[], pwSig=null, friend=null, packSig=null, od=null, odP=0;
 let ppe=false, ppeP=0, orPt=null, orP=0, recP=0, ppeWarn=0, ppeUsed=false;
@@ -320,6 +322,7 @@ const POWER_KEYS=Object.keys(POWERS).filter(function(k){
 /* ================= LEVEL ================= */
 function startLevel(n){
   level=n; syncLevelMenu(n); t=0; flavorT=8; dropP=0; dirtyP=0; cart=null; carts=[]; codeBed=null;
+  levelCoinsEarned=0; levelToolUses={};
   SLOTS=packUp?8:6; EMAX=tankUp?150:100;
   carry=""; carryBed=null; boost=0; discharged=0; energy=EMAX; warnedE=0; gearFlash=0;
   rush=0; trail=[]; trailCol="#8FE04A"; confetti=0;
@@ -853,6 +856,7 @@ function deliver(b){
   const bx=(b.room.bx+.5)*TILE, by=(b.room.by+1)*TILE;
   give.forEach(function(k,i){
     b.got.push(k);
+    levelToolUses[k]=(levelToolUses[k]||0)+1;
     fx.push({k:k, x0:player.x, y0:player.y, x1:bx+(i-give.length/2)*7, y1:by, t:0, d:0.45});
   });
   const left=b.p.need.filter(function(k){return b.got.indexOf(k)<0;});
@@ -1007,7 +1011,7 @@ function endZomb(win2){
   if(win2){
     SFX.win();
     showBanner("UNIT CLEAR","ok",2.6);
-    coins+=45;
+    awardCoins(45);
     log("All down. They'll wake up embarrassed.   +45 coins",true);
     grantPower(POWER_KEYS[Math.floor(Math.random()*POWER_KEYS.length)]);
   } else {
@@ -1045,7 +1049,7 @@ function endNiv(win2){
   if(carry==="niv") carry="";
   if(win2){
     showBanner("SETTLED","ok",2.8);
-    coins+=35;
+    awardCoins(35);
     log("Chest settles, sats come up. Somebody exhales.   +35 coins",true);
     grantPower(POWER_KEYS[Math.floor(Math.random()*POWER_KEYS.length)]);
   } else {
@@ -1073,7 +1077,7 @@ function endRant(win2){
   for(let i=events.length-1;i>=0;i--) if(events[i].kind==="rant") events.splice(i,1);
   if(win2){
     showBanner("THEY RAN OUT OF STEAM","ok",2.8);
-    coins+=35; energy=Math.max(4,energy-18);
+    awardCoins(35); energy=Math.max(4,energy-18);
     log("They said their piece. You said nothing. Correctly.   +35 coins",true);
     grantPower(POWER_KEYS[Math.floor(Math.random()*POWER_KEYS.length)]);
   } else {
@@ -1101,7 +1105,7 @@ function endFight(win2){
     // you got between them, and you did not come out of it clean
     bleed=9;
     showBanner("BROKEN UP","ok",2.6);
-    coins+=30;
+    awardCoins(30);
     log("Split them up. Your lip is bleeding but nobody asks.   +30 coins",true);
     grantPower(POWER_KEYS[Math.floor(Math.random()*POWER_KEYS.length)]);
   } else {
@@ -1176,7 +1180,7 @@ function endBugs(win2){
   for(let i=events.length-1;i>=0;i--) if(events[i].kind==="bugs") events.splice(i,1);
   if(win2){
     showBanner("ALL SQUISHED","ok",2.6);
-    coins+=25;
+    awardCoins(25);
     log("Every one of them. Somebody get a mop.   +25 coins",true);
     grantPower(POWER_KEYS[Math.floor(Math.random()*POWER_KEYS.length)]);
   } else {
@@ -1197,7 +1201,7 @@ function endFire(win2){
   if(win2){
     SFX.win();
     showBanner("ALL OUT","ok",2.6);
-    coins+=40;
+    awardCoins(40);
     log("Out. He says he wasn't smoking.   +40 coins",true);
     grantPower(POWER_KEYS[Math.floor(Math.random()*POWER_KEYS.length)]);
   } else {
@@ -1238,7 +1242,7 @@ function cleanCall(){
 }
 function completeEvent(kind,pts,msg){
   for(let i=events.length-1;i>=0;i--) if(events[i].kind===kind) events.splice(i,1);
-  coins+=pts;
+  awardCoins(pts);
   if(PRIZE_EVENTS.indexOf(kind)>=0){
     grantPower(POWER_KEYS[Math.floor(Math.random()*POWER_KEYS.length)]);
     log(msg+"   +"+pts+" coins",true);
@@ -1363,7 +1367,7 @@ function usePower(i){
     if(ev){
       const bonus=Math.max(0,Math.round(ev.t*6));
       for(let j=events.length-1;j>=0;j--) if(events[j].kind==="high") events.splice(j,1);
-      coins+=30+Math.round(bonus/40);
+      awardCoins(30+Math.round(bonus/40));
       log("Room stops moving. Nobody needs to know.   +"+(30+Math.round(bonus/40))+" coins",true);
       grantPower(POWER_KEYS[Math.floor(Math.random()*POWER_KEYS.length)]);
     }
@@ -1519,10 +1523,10 @@ function awardPrize(){
   if(ev){
     const bonus=Math.max(0,Math.round(ev.t*6));
     for(let i=events.length-1;i>=0;i--) if(events[i].kind==="clean") events.splice(i,1);
-    coins+=30+Math.round(bonus/40);
+    awardCoins(30+Math.round(bonus/40));
     log("ALL FOUR BAYS CLEAN. Nobody asks again.   +"+(30+Math.round(bonus/40))+" coins",true);
   } else {
-    coins+=20;
+    awardCoins(20);
     log("ALL FOUR BAYS CLEAN. Full tank and a clear unit — go.   +20 coins",true);
   }
   grantPower("FRIEND");
@@ -2258,7 +2262,7 @@ function update(dt){
       recP=0; carry="";
       const bonus=Math.max(0,Math.round(orEv.t*6));
       for(let i=events.length-1;i>=0;i--) if(events[i].kind==="ortx") events.splice(i,1);
-      coins+=30+Math.round(bonus/40);
+      awardCoins(30+Math.round(bonus/40));
       const id=orPt.dest.room.id;
       orPt=null;                        // settled in, and off your list
       SFX.win();
@@ -2278,7 +2282,7 @@ function update(dt){
         odP=0; carry="";
         const bonus=Math.max(0,Math.round(odEv.t*7));
         for(let i=events.length-1;i>=0;i--) if(events[i].kind==="od") events.splice(i,1);
-        coins+=35+Math.round(bonus/40);
+        awardCoins(35+Math.round(bonus/40));
         if(od){
           od.out=1;
           od.nurses=[{x:(WASH.x0+0.5)*TILE,y:(WASH.y0+0.5)*TILE,ph:0},
@@ -7136,9 +7140,16 @@ async function begin(n){
   running=true;last=performance.now();hud();gameFrame=requestAnimationFrame(loop);
 }
 function saveProgress(completedLevel,fullClear){
+  const favoriteTools=Object.keys(levelToolUses).sort(function(a,b){
+    return levelToolUses[b]-levelToolUses[a];
+  }).slice(0,3).map(function(key){return {name:TOOLS[key].n,uses:levelToolUses[key]};});
   fetch("/api/progress",{method:"POST",credentials:"same-origin",cache:"no-store",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({level:completedLevel,totalDischarged:totalDischarged})}).catch(function(){});
+    body:JSON.stringify({level:completedLevel,totalDischarged:totalDischarged,
+      durationSeconds:Math.round(t),coinsEarned:levelCoinsEarned,favoriteTools:favoriteTools})
+  }).then(function(response){
+    if(response.ok && window.parent!==window) window.parent.postMessage({type:"shift-progress-saved"},location.origin);
+  }).catch(function(){});
   fetch("/api/leaderboard",{method:"POST",credentials:"same-origin",cache:"no-store",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({score:totalDischarged,levelReached:completedLevel})}).catch(function(){});
@@ -7208,7 +7219,10 @@ function loop(now){
 })();
 let selectedLevel=1, hasFullAccess=false, accessUnavailable=false, isAdmin=false, isSignedIn=false, completedLevels=[];
 function isLevelUnlocked(n){
-  return n<=1 || isAdmin || (hasFullAccess && completedLevels.indexOf(n-1)!==-1);
+  if(n<=1) return true;
+  if(!isAdmin&&!hasFullAccess) return false;
+  for(let previous=1;previous<n;previous++) if(completedLevels.indexOf(previous)===-1) return false;
+  return true;
 }
 async function refreshProgress(signedIn){
   if(!signedIn){ completedLevels=[]; return; }
