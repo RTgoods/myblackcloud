@@ -2811,7 +2811,27 @@ function resize(){
   fatX.clearRect(0,0,VW,VH);fatX.fillStyle=fg;fatX.fillRect(0,0,VW,VH);
   darkC.width=Math.max(1,VW); darkC.height=Math.max(1,VH);
 }
-addEventListener("resize",resize);
+let viewportFitFrame=0;
+function fitVisibleViewport(){
+  if(viewportFitFrame) return;
+  viewportFitFrame=requestAnimationFrame(function(){
+    viewportFitFrame=0;
+    const app=document.getElementById("app"),viewport=window.visualViewport;
+    if(viewport&&matchMedia("(max-width:767px)").matches){
+      const height=Math.round(viewport.height)+"px";
+      document.documentElement.style.height=height;
+      document.body.style.height=height;
+      app.style.height=height;
+    }else{
+      document.documentElement.style.height="";
+      document.body.style.height="";
+      app.style.height="";
+    }
+    resize();
+  });
+}
+addEventListener("resize",fitVisibleViewport);
+if(window.visualViewport) window.visualViewport.addEventListener("resize",fitVisibleViewport);
 // HUD content and desktop layout changes can resize the stage without a window event.
 new ResizeObserver(function(){resize();if(!running && player) draw();})
   .observe(document.getElementById("stage"));
@@ -7300,7 +7320,7 @@ const requestedLevel=(function(){
   const n=Number(new URLSearchParams(location.search).get("level"));
   return n>=1&&n<=8?n:null;
 })();
-if(requestedLevel){ ov.classList.add("hide"); }
+if(!requestedLevel){ ov.classList.remove("hide"); }
 refreshAccess().then(function(){
   if(requestedLevel){ syncLevelMenu(requestedLevel); begin(requestedLevel); }
   else if(isSignedIn){ begin(1); }

@@ -3,7 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SHIFT">
+<meta name="theme-color" content="#06090c">
 <title>SHIFT — MyBlackCloud</title>
+<link rel="manifest" href="/game/manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -11,7 +16,6 @@
 </head>
 <body class="paused">
 <div id="app">
-  <button id="menuToggle" type="button" aria-controls="desktopMenu" aria-expanded="false" aria-label="Open shift menu">☰</button>
   <button id="menuBackdrop" type="button" aria-label="Close shift menu" hidden></button>
   <aside id="desktopMenu" aria-label="Shift controls">
     <div class="desktopBrand">
@@ -36,6 +40,7 @@
   </aside>
   <div id="hud">
     <div id="hudTop">
+      <button id="menuToggle" type="button" aria-controls="desktopMenu" aria-expanded="false" aria-label="Open shift menu">☰</button>
       <div id="lvl">LEVEL 1</div><div class="sp"></div>
       <div id="energy"><span class="cap">ENERGY<em id="gear">FULL</em></span><i><b></b></i></div>
       <button id="mute" title="sound">♪</button>
@@ -56,7 +61,7 @@
     <div id="powers"></div>
     <div id="actBtn">ACT</div>
   </div>
-  <div id="ov">
+  <div id="ov" class="hide">
     <h1>SHIFT</h1>
     <p class="k">One fanny pack. An ICU that hides everything.</p>
     <p>Pick your badge below. The <b style="color:var(--spo2);font-weight:500">RT</b> works airways, oxygen and ventilators. The <b style="color:#E8ECEF;font-weight:500">RN</b> works lines, drugs, drains and skin — different bag, different patients, same shift.</p>
