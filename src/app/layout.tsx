@@ -50,7 +50,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="flex">
+        <div className="md:flex">
           <Sidebar
             email={user?.email ?? null}
             handle={handle}
@@ -60,7 +60,7 @@ export default async function RootLayout({
             isAdmin={access?.isAdmin ?? false}
             completedLevels={completedLevels}
           />
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 pt-14 md:pt-0">
             {children}
             <ConditionalFooter />
           </div>
