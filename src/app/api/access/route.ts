@@ -14,5 +14,17 @@ export async function GET(request: NextRequest) {
   if (error && error.name !== 'AuthSessionMissingError') return NextResponse.json({ error: 'Access service unavailable' }, { status: 503 })
   const access = await gameAccess(db, user)
   if ('unavailable' in access && access.unavailable) return NextResponse.json({ error: 'Access service unavailable' }, { status: 503 })
-  return NextResponse.json({ ...access, user: user ? { id: user.id, email: user.email } : null }, { headers: { 'Cache-Control': 'private, no-store' } })
+
+  let role: 'RT' | 'RN' | null = null
+  let gender: 'male' | 'female' | null = null
+  if (user) {
+    const { data: profile } = await db.from('profiles').select('role, gender').eq('id', user.id).maybeSingle()
+    role = profile?.role ?? null
+    gender = profile?.gender ?? null
+  }
+
+  return NextResponse.json(
+    { ...access, role, gender, user: user ? { id: user.id, email: user.email } : null },
+    { headers: { 'Cache-Control': 'private, no-store' } },
+  )
 }

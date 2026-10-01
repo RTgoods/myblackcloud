@@ -35,9 +35,10 @@ export function BuyButton({ userId, hasPurchased }: Props) {
   const buttonStyle: React.CSSProperties = {
     background: 'linear-gradient(180deg,#38D6E0 0%,#1FA9B3 100%)',
     color: '#06090C',
-    fontSize: 15,
+    fontSize: 11,
     letterSpacing: 3,
-    padding: '16px 44px',
+    padding: '16px 28px',
+    minHeight: 52,
     fontWeight: 900,
     textTransform: 'uppercase',
     border: 'none',
@@ -61,9 +62,6 @@ export function BuyButton({ userId, hasPurchased }: Props) {
         {loading ? 'Redirecting…' : `Unlock Full Shift — ${formatPrice()}`}
       </button>
       {error && <p className="mt-2 text-[11px] tracking-[1px]" style={{ color: '#FF3B4E' }}>{error}</p>}
-      <p className="mt-3 text-[10px] tracking-[2px] uppercase" style={{ color: '#5C6D7A' }}>
-        One-time payment · Instant access · Level 1 is always free
-      </p>
     </div>
   )
 }

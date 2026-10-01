@@ -8,7 +8,8 @@ import { createClient } from '@/lib/supabase/client'
 type Mode = 'login' | 'signup' | 'recovery'
 
 export function LoginForm() {
-  const [mode, setMode] = useState<Mode>('login')
+  const searchParams = useSearchParams()
+  const [mode, setMode] = useState<Mode>(searchParams.get('mode') === 'signup' ? 'signup' : 'login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -16,7 +17,6 @@ export function LoginForm() {
   const [message, setMessage] = useState('')
 
   const router = useRouter()
-  const searchParams = useSearchParams()
   const requestedRedirect = searchParams.get('redirect') || '/'
   const redirectTo = requestedRedirect.startsWith('/') && !requestedRedirect.startsWith('//') && !requestedRedirect.includes('\\') ? requestedRedirect : '/'
   useEffect(() => { if (searchParams.get('error') === 'callback_error') setError('That sign-in or reset link has expired. Please request a new one.') }, [searchParams])

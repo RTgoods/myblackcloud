@@ -46,7 +46,8 @@ function nextName(){
   if(!namePool.length) namePool=NAMES.slice().sort(function(){return Math.random()-0.5;});
   return namePool.pop();
 }
-let role="RT";                      // set on the start screen
+let role="RT";                      // set on the start screen, or from the account's saved character
+let playerGender="male";            // from the account's saved character — cosmetic only, no mechanics depend on it
 const RT_KEYS=["SUCT","YANK","INLINE","ABG","VENTK","NC","NRB","FLOW",
                "XTREE","MDI","NEB","BVM","PEEP","ETCO2","TLUNG","MANO"];
 const RN_KEYS=Object.keys(RN_TOOLS);
@@ -7090,6 +7091,13 @@ async function begin(n){
         "PLAY FREE LEVEL",function(){begin(1);});
       setMenu(true);return;
     }
+    if(!isLevelUnlocked(n)){
+      screen("LEVEL LOCKED",[
+        {t:"Clear Level "+(n-1)+" first to open Level "+n+".",k:1},
+        {t:"Your purchase unlocks every level — but each one opens once the last is solved."}],
+        "PLAY LEVEL "+(n-1),function(){begin(n-1);});
+      setMenu(true);return;
+    }
   }
   if(!desktopLayout.matches) setMenu(false);
   cancelAnimationFrame(gameFrame);
@@ -7112,6 +7120,10 @@ function saveProgress(completedLevel,fullClear){
 }
 function win(){
   const nx=level+1;
+  if(completedLevels.indexOf(level)===-1){
+    completedLevels=completedLevels.concat([level]).sort(function(a,b){return a-b;});
+    syncLevelMenu(selectedLevel);
+  }
   if(nx>8){
     saveProgress(level,true);
     screen("SHIFT COMPLETE",
@@ -7169,7 +7181,19 @@ function loop(now){
     };
   });
 })();
-let selectedLevel=1, hasFullAccess=false, accessUnavailable=false;
+let selectedLevel=1, hasFullAccess=false, accessUnavailable=false, isAdmin=false, isSignedIn=false, completedLevels=[];
+function isLevelUnlocked(n){
+  return n<=1 || isAdmin || (hasFullAccess && completedLevels.indexOf(n-1)!==-1);
+}
+async function refreshProgress(signedIn){
+  if(!signedIn){ completedLevels=[]; return; }
+  try{
+    const response=await fetch("/api/progress",{credentials:"same-origin",cache:"no-store",signal:AbortSignal.timeout(8000)});
+    if(!response.ok) throw new Error("Progress unavailable");
+    const data=await response.json();
+    completedLevels=Array.isArray(data.completedLevels)?data.completedLevels:[];
+  }catch(error){ completedLevels=[]; }
+}
 async function refreshAccess(){
   const status=document.getElementById("accountStatus");
   try{
@@ -7177,14 +7201,29 @@ async function refreshAccess(){
     if(!response.ok) throw new Error("Access unavailable");
     const account=await response.json();
     hasFullAccess=account.allowed===true || account.isAdmin===true;
+    isAdmin=account.isAdmin===true;
+    isSignedIn=!!account.user;
     accessUnavailable=false;
-    status.textContent=hasFullAccess?"All levels unlocked":account.user?"Signed in · Level 1 free":"Guest · Level 1 free";
+    if(account.role==="RT"||account.role==="RN") role=account.role;
+    if(account.gender==="male"||account.gender==="female") playerGender=account.gender;
+    document.querySelectorAll("#roles .role").forEach(function(button){
+      button.classList.toggle("sel",button.getAttribute("data-role")===role);
+    });
+    await refreshProgress(!!account.user);
+    status.textContent=account.user
+      ? account.user.email+" · "+(hasFullAccess?"All levels unlocked":"Level 1 free")
+      : "Guest · Level 1 free";
     const signIn=document.getElementById("signInLink");
     signIn.textContent="YOUR ACCOUNT · SIGN IN / SIGN UP";
-    document.getElementById("logoutBtn").disabled=!account.user;
+    signIn.hidden=!!account.user;
     signIn.href="/auth/login?redirect=%2Fgame";
+    const logout=document.getElementById("logoutBtn");
+    logout.hidden=!account.user;
+    logout.disabled=!account.user;
   }catch(error){
-    hasFullAccess=false;accessUnavailable=true;
+    hasFullAccess=false;isAdmin=false;isSignedIn=false;completedLevels=[];accessUnavailable=true;
+    document.getElementById("signInLink").hidden=false;
+    document.getElementById("logoutBtn").hidden=true;
     document.getElementById("logoutBtn").disabled=true;
     status.textContent="Level 1 free · Account service unavailable";
   }
@@ -7202,7 +7241,7 @@ function setMenu(open){
   keys={};act=false;actHeld=false;dropStick();
   if(!open && document.getElementById("desktopMenu").contains(document.activeElement)) document.getElementById("menuToggle").focus();
 }
-document.getElementById("menuToggle").onclick=function(){setMenu(!document.getElementById("app").classList.contains("menuOpen"));};
+document.getElementById("menuToggle").onclick=function(){if(embedded) return; setMenu(!document.getElementById("app").classList.contains("menuOpen"));};
 document.getElementById("logoutBtn").onclick=async function(){
   const button=this;
   button.disabled=true;button.textContent="LOGGING OUT…";
@@ -7221,33 +7260,27 @@ document.getElementById("logoutBtn").onclick=async function(){
 };
 document.getElementById("menuBackdrop").onclick=function(){setMenu(false);};
 addEventListener("keydown",function(e){if(e.key==="Escape") setMenu(false);});
-desktopLayout.addEventListener("change",function(){setMenu(desktopLayout.matches);});
-document.getElementById("refreshAccess").onclick=refreshAccess;
+desktopLayout.addEventListener("change",function(){setMenu(embedded?false:desktopLayout.matches);});
 addEventListener("focus",refreshAccess);
 
 function syncLevelMenu(n){
   selectedLevel=n;
   document.querySelectorAll("#levelSelect button").forEach(function(button){
     const value=Number(button.dataset.level);
+    const unlocked=isLevelUnlocked(value);
     button.setAttribute("aria-pressed",String(value===n));
     button.classList.toggle("current",value===level);
-    button.classList.toggle("locked",value>1&&!hasFullAccess);
-    button.querySelector("small").textContent=value===1?"FREE":hasFullAccess?Math.min(value,5)+" BEDS":"LOCKED";
+    button.classList.toggle("locked",!unlocked);
   });
-  document.getElementById("levelSummary").textContent=n+" discharge"+(n===1?"":"s")+" · "+Math.min(n,5)+" active bed"+(n===1?"":"s");
-  document.getElementById("startLevelBtn").textContent=n>1&&!hasFullAccess?"CHECK ACCESS · LEVEL "+n:"START LEVEL "+n;
 }
 for(let n=1;n<=8;n++){
   const button=document.createElement("button");
   button.type="button";button.dataset.level=n;
-  button.innerHTML='<strong>'+String(n).padStart(2,"0")+'</strong><span>LEVEL '+n+'<small>'+Math.min(n,5)+' BED'+(n===1?'':'S')+'</small></span>';
-  button.setAttribute("aria-label","Select level "+n);
-  button.onclick=function(){syncLevelMenu(n);};
+  button.innerHTML='<strong>'+String(n).padStart(2,"0")+'</strong>';
+  button.setAttribute("aria-label","Launch level "+n);
+  button.onclick=function(){fullHouse=false;begin(n);this.blur();};
   document.getElementById("levelSelect").appendChild(button);
 }
-document.getElementById("startLevelBtn").onclick=function(){
-  fullHouse=false;begin(selectedLevel);this.blur();
-};
 document.getElementById("startBtn").onclick=function(){SFX.start();fullHouse=false;begin(1);};
 (function(){
   const mb=document.getElementById("mute");
@@ -7259,7 +7292,17 @@ document.getElementById("startBtn").onclick=function(){SFX.start();fullHouse=fal
     mb.className = onNow ? "" : "off";
   });
 })();
-setMenu(desktopLayout.matches);
+const embedded=new URLSearchParams(location.search).get("embed")==="1";
+if(embedded){ document.body.classList.add("embedded"); }
+setMenu(embedded?false:desktopLayout.matches);
 startLevel(1);resize();hud();draw();
-refreshAccess();
+const requestedLevel=(function(){
+  const n=Number(new URLSearchParams(location.search).get("level"));
+  return n>=1&&n<=8?n:null;
+})();
+if(requestedLevel){ ov.classList.add("hide"); }
+refreshAccess().then(function(){
+  if(requestedLevel){ syncLevelMenu(requestedLevel); begin(requestedLevel); }
+  else if(isSignedIn){ begin(1); }
+});
 })();

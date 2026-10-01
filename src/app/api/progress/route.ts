@@ -55,6 +55,7 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: 'Progress unavailable' }, { status: 503 })
   if (data?.error === 'stale_progress') return NextResponse.json(data, { status: 409 })
   if (data?.error === 'purchase_required') return NextResponse.json({ error: 'Purchase required' }, { status: 403 })
+  if (data?.error === 'level_locked') return NextResponse.json(data, { status: 403 })
   return NextResponse.json(data)
 }
 

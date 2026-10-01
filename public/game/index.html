@@ -14,20 +14,25 @@
   <button id="menuToggle" type="button" aria-controls="desktopMenu" aria-expanded="false" aria-label="Open shift menu">☰</button>
   <button id="menuBackdrop" type="button" aria-label="Close shift menu" hidden></button>
   <aside id="desktopMenu" aria-label="Shift controls">
-    <div class="desktopBrand"><span>SHIFT <small>ICU</small></span></div>
+    <div class="desktopBrand">
+      <a href="/" target="_top"><span>My Black Cloud<small>SHIFT · ICU</small></span></a>
+    </div>
     <section class="accountPanel" aria-label="Your account">
       <p id="accountStatus" role="status">Checking access…</p>
       <a id="signInLink" href="/auth/login?redirect=%2Fgame" target="_top">YOUR ACCOUNT · SIGN IN / SIGN UP</a>
       <a id="unlockLink" href="/" target="_top">UNLOCK ALL LEVELS →</a>
-      <button id="refreshAccess" type="button">Refresh access</button>
+      <button id="logoutBtn" type="button" disabled hidden>LOG OUT</button>
     </section>
+    <nav class="sideNav">
+      <a href="/game/index.html?level=1" target="_top">Play SHIFT</a>
+      <a href="/leaderboard" target="_top">Leaderboard</a>
+    </nav>
     <p class="desktopEyebrow"><span>SHIFT DIRECTORY</span><span>01 — 08</span></p>
     <nav id="levelSelect" aria-label="Level selection"></nav>
-    <p id="levelSummary" aria-live="polite"></p>
-    <button id="startLevelBtn" type="button">START LEVEL 1</button>
-    <p class="desktopHint">Starts a fresh level with your selected badge.</p>
-    <button id="logoutBtn" type="button" disabled>LOG OUT</button>
-    <div class="desktopKeys"><kbd>WASD</kbd> / <kbd>↑ ↓ ← →</kbd> move · <kbd>SPACE</kbd> act</div>
+    <div class="sideFooter">
+      <a href="/privacy" target="_top">Privacy</a>
+      <a href="/terms" target="_top">Terms</a>
+    </div>
   </aside>
   <div id="hud">
     <div id="hudTop">
