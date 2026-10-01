@@ -7266,7 +7266,7 @@ function setMenu(open){
   keys={};act=false;actHeld=false;dropStick();
   if(!open && document.getElementById("desktopMenu").contains(document.activeElement)) document.getElementById("menuToggle").focus();
 }
-document.getElementById("menuToggle").onclick=function(){if(embedded) return; setMenu(!document.getElementById("app").classList.contains("menuOpen"));};
+document.getElementById("menuToggle").onclick=function(){setMenu(!document.getElementById("app").classList.contains("menuOpen"));};
 document.getElementById("logoutBtn").onclick=async function(){
   const button=this;
   button.disabled=true;button.textContent="LOGGING OUT…";

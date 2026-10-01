@@ -508,18 +508,18 @@ kbd{font:inherit;color:#DBE8ED}
 .cell{height:27px;flex-direction:row;gap:5px;padding:4px 6px}
 .cell .n{font-size:13px;flex:0 0 auto}
 .cell .tick{width:auto;flex:1;height:3px}
-#detail{margin-top:4px;padding:5px 7px;min-height:0}
-#detail .who{margin:0 0 3px;padding:0;border:0;gap:5px}
-#detail .who img{width:20px;height:20px}
-#detail .who .nm{font-size:14px}
-#detail .dx{font-size:10px;line-height:1.25}
-#detail #care{margin-top:3px}
-#detail .stage{font-size:8px;margin-top:3px}
-#detail .needs{gap:3px;margin-top:3px}
+#detail{margin-top:3px;padding:4px 6px;min-height:0}
+#detail .who{margin:0 0 2px;padding:0;border:0;gap:4px}
+#detail .who img{width:18px;height:18px}
+#detail .who .nm{font-size:13px}
+#detail .dx{font-size:10px;line-height:1.15}
+#detail #care{margin-top:2px}
+#detail .stage{font-size:8px;margin-top:2px}
+#detail .needs{gap:3px;margin-top:2px}
 #detail .need{font-size:9px;padding:2px 4px}
 #detail .need img{width:12px;height:12px}
-#detail .note{font-size:9px;line-height:1.25;margin-top:3px}
-#detail .empty{padding:2px 0}
+#detail .note{font-size:9px;line-height:1.15;margin-top:2px}
+#detail .empty{padding:1px 0}
 #evtray{margin-bottom:3px}
 .ev{font-size:8px;padding:2px 5px}
 .ev b{display:inline;font-size:9px;margin-right:5px}
@@ -534,7 +534,7 @@ kbd{font:inherit;color:#DBE8ED}
   #detail .empty{grid-column:1 / -1}
 }
 @media (max-width:649px){
-  #detail{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:3px 8px}
+  #detail{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2px 6px}
   #detail .who{grid-column:1 / -1;margin:0}
   #detail .dx{grid-column:1;grid-row:2}
   #detail #care{grid-column:2;grid-row:2;margin:0}
@@ -604,11 +604,9 @@ kbd{font:inherit;color:#DBE8ED}
 #logoutBtn:not(:disabled):hover{background:#0d1b20;border-color:#38D6E0}
 #logoutBtn[hidden]{display:none}
 
-/* Embedded in /play inside the main site's own sidebar — that sidebar is
-   the only shift menu on screen, so this copy of it stays fully hidden. */
-body.embedded #menuToggle,
-body.embedded #desktopMenu,
-body.embedded #menuBackdrop{display:none!important}
+/* Embedded in /play — the site's own floating trigger is suppressed there
+   (it would sit right on top of this one), so this hamburger + its menu
+   is the only shift menu on screen and must stay fully usable. */
 body.embedded #hudTop{padding-left:0}
 
 @media (max-width:360px){
