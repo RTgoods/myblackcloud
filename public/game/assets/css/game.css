@@ -625,7 +625,7 @@ body.embedded #hudTop{padding-left:0}
 }
 
 @media (max-width:767px){
-  html,body{inset:0;height:100%;height:100dvh;min-height:100svh;overflow:hidden;touch-action:none}
+  html,body{position:fixed;inset:0;height:100%;height:100dvh;min-height:100svh;overflow:hidden;touch-action:none;overscroll-behavior:none}
   #app{height:100%;height:100dvh;min-height:100svh;overflow:hidden;touch-action:none}
   #desktopMenu{padding-bottom:calc(20px + env(safe-area-inset-bottom))}
   #hudTop{padding-left:0}

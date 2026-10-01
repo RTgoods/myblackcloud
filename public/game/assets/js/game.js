@@ -749,7 +749,12 @@ addEventListener("keyup",function(e){const k=e.key.toLowerCase();
   keys[k]=false; if(k===" "){act=false;actHeld=false;}});
 document.addEventListener("touchmove",function(e){
   // the intro and the vending menu are real scrollable lists — leave them alone
-  if(e.target.closest("#ov")||e.target.closest("#shop")||e.target.closest("#desktopMenu")||e.target.closest("#hud")) return;
+  if(e.target.closest("#ov")||e.target.closest("#shop")||e.target.closest("#desktopMenu")) return;
+  // #hud only scrolls internally when it actually overflows (cramped short screens) —
+  // otherwise a drag starting near the top bar must not fall through to the page,
+  // or iOS rubber-bands the document and flips Safari's toolbar open/closed.
+  const hudEl=e.target.closest("#hud");
+  if(hudEl && hudEl.scrollHeight>hudEl.clientHeight) return;
   e.preventDefault();},{passive:false});
 
 /* ================= MOVEMENT ================= */
