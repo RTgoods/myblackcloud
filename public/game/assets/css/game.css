@@ -631,7 +631,7 @@ body.embedded #hudTop{padding-left:0}
   #hudTop{padding-left:0}
   #menuToggle{position:relative;top:auto;left:auto;flex:0 0 32px}
   #packRow{bottom:calc(env(safe-area-inset-bottom) + 232px)}
-  #powers{bottom:calc(env(safe-area-inset-bottom) + 168px)}
+  #powers{bottom:calc(env(safe-area-inset-bottom) + 232px)}
   #stickZone{bottom:calc(env(safe-area-inset-bottom) + 38px)}
   #actBtn{bottom:calc(env(safe-area-inset-bottom) + 56px)}
 }
