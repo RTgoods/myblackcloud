@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { gameAccess } from '@/lib/game-access'
 import { BuyButton } from '@/components/BuyButton'
+import { FieldGuideTabs } from '@/components/FieldGuideTabs'
 import { formatPrice } from '@/lib/pricing'
 import heroImage from '../../public/images/shift-hero.webp'
 import patientRadarImage from '../../public/images/patient-radar.webp'
@@ -146,71 +147,43 @@ const fieldGuide = [
   },
 ]
 
-function ItemIcon({ icon, color }: { icon: string; color: string }) {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 64 64" className="h-10 w-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.45)]">
-      {icon === 'can' && (
-        <>
-          <rect x="23" y="9" width="18" height="46" rx="5" fill="#26343d" stroke="#c3d2db" strokeWidth="2" />
-          <path d="M25 25h14v15H25z" fill={color} />
-          <path d="M34 27l-5 7h4l-2 5 7-8h-4l2-4z" fill="white" />
-          <path d="M27 6h10v4H27z" rx="2" fill="#d2dbe0" />
-        </>
-      )}
-      {icon === 'battery' && (
-        <>
-          <rect x="18" y="12" width="28" height="42" rx="5" fill="#1a2830" stroke={color} strokeWidth="3" />
-          <path d="M26 7h12v6H26z" fill="#1a2830" stroke={color} strokeWidth="2" />
-          <path d="M35 20l-10 15h8l-4 11 13-17h-8l4-9z" fill={color} />
-        </>
-      )}
-      {icon === 'bolt' && <path d="M36 5 15 35h14l-3 24 24-34H35l1-20z" fill={color} stroke="#eff7fa" strokeWidth="2" strokeLinejoin="round" />}
-      {icon === 'kit' && (
-        <>
-          <rect x="12" y="22" width="40" height="30" rx="6" fill={color} stroke="#f0d67a" strokeWidth="2" />
-          <path d="M23 22v-7h18v7M12 34h40M29 29h6v11h-6zM26.5 31.5h11v6h-11z" fill="#26343d" stroke="#26343d" strokeWidth="2" />
-        </>
-      )}
-      {icon === 'hand' && (
-        <>
-          <path d="M17 34V17a3 3 0 0 1 6 0v12-18a3 3 0 0 1 6 0v18-16a3 3 0 0 1 6 0v17-12a3 3 0 0 1 6 0v17l3-5a4 4 0 0 1 7 4l-8 14H26L15 41a5 5 0 0 1 2-7z" fill={color} stroke="#806515" strokeWidth="2" strokeLinejoin="round" />
-        </>
-      )}
-      {icon === 'friend' && (
-        <>
-          <circle cx="22" cy="19" r="8" fill={color} />
-          <circle cx="43" cy="19" r="8" fill="#b8ecf2" />
-          <path d="M8 51c0-12 5-19 14-19s14 7 14 19H8zm21 0c0-9 5-15 13-15s14 6 14 15H29z" fill={color} stroke="#18383d" strokeWidth="2" />
-        </>
-      )}
-      {icon === 'skull' && (
-        <>
-          <path d="m10 45 44-28M10 17l44 28" stroke="#c9c2b4" strokeWidth="5" strokeLinecap="round" />
-          <path d="M32 9c-12 0-20 9-20 20 0 7 4 12 10 15v9h20v-9c6-3 10-8 10-15 0-11-8-20-20-20z" fill={color} stroke="#8e877a" strokeWidth="2" />
-          <ellipse cx="25" cy="29" rx="4" ry="6" fill="#1a1814" />
-          <ellipse cx="39" cy="29" rx="4" ry="6" fill="#1a1814" />
-          <path d="m32 34-3 5h6zM25 47v6m7-6v6m7-6v6" stroke="#1a1814" strokeWidth="2" />
-        </>
-      )}
-      {icon === 'pack' && (
-        <>
-          <path d="M22 20v-6a10 10 0 0 1 20 0v6" fill="none" stroke="#f0d67a" strokeWidth="4" />
-          <rect x="12" y="19" width="40" height="34" rx="8" fill={color} stroke="#f0d67a" strokeWidth="2" />
-          <path d="M19 27h26v17H19z" fill="#8c711e" />
-          <path d="M29 31h6v9h-6zm-2 2h10v5H27z" fill="#8fe04a" />
-        </>
-      )}
-      {icon === 'deepBattery' && (
-        <>
-          <rect x="19" y="11" width="26" height="44" rx="5" fill="#1a2830" stroke={color} strokeWidth="3" />
-          <path d="M26 6h12v6H26z" fill="#1a2830" stroke={color} strokeWidth="2" />
-          <path d="M24 40h16v10H24z" fill={color} />
-          <path d="M35 16 25 31h8l-3 10 13-17h-8l4-8z" fill={color} />
-        </>
-      )}
-    </svg>
-  )
-}
+const respiratoryTools = [
+  { id: 'SUCT', name: 'Suction cath', size: 1, description: 'Remove airway secretions with controlled suction.', icon: 'suction', color: '#38D6E0' },
+  { id: 'YANK', name: 'Yankauer', size: 1, description: 'Clear oral secretions with a rigid suction tip.', icon: 'airway', color: '#6BB8F2' },
+  { id: 'INLINE', name: 'Inline suction', size: 1, description: 'Suction secretions without disconnecting the circuit.', icon: 'suction', color: '#7FD4E0' },
+  { id: 'ABG', name: 'ABG syringe', size: 1, description: 'Collect an arterial blood gas sample.', icon: 'syringe', color: '#8FE04A' },
+  { id: 'VENTK', name: 'Venturi kit', size: 1, description: 'Deliver oxygen at a controlled concentration.', icon: 'mask', color: '#F2B33D' },
+  { id: 'NC', name: 'Nasal cannula', size: 1, description: 'Provide low-flow supplemental oxygen.', icon: 'cannula', color: '#38D6E0' },
+  { id: 'NRB', name: 'Non-rebreather', size: 1, description: 'Provide high-concentration oxygen with a reservoir mask.', icon: 'mask', color: '#6BB8F2' },
+  { id: 'FLOW', name: 'Flowmeter', size: 2, description: 'Set and monitor oxygen flow from the wall supply.', icon: 'flowmeter', color: '#8FE04A' },
+  { id: 'XTREE', name: 'Christmas tree', size: 1, description: 'Connect oxygen tubing to the flow source.', icon: 'connector', color: '#F2B33D' },
+  { id: 'MDI', name: 'MDI + spacer', size: 1, description: 'Deliver a metered inhaled medication dose.', icon: 'inhaler', color: '#C96BD8' },
+  { id: 'NEB', name: 'Neb kit', size: 1, description: 'Deliver medication as an aerosol mist.', icon: 'nebulizer', color: '#7FD4E0' },
+  { id: 'BVM', name: 'BVM', size: 2, description: 'Provide manual ventilation with a bag and mask.', icon: 'bag', color: '#38D6E0' },
+  { id: 'PEEP', name: 'PEEP valve', size: 1, description: 'Maintain positive pressure during exhalation.', icon: 'valve', color: '#F2B33D' },
+  { id: 'ETCO2', name: 'ETCO2 detector', size: 1, description: 'Check exhaled carbon dioxide during ventilation.', icon: 'monitor', color: '#6BB8F2' },
+  { id: 'TLUNG', name: 'Test lung', size: 1, description: 'Check ventilator function and circuit setup.', icon: 'lung', color: '#8FE04A' },
+  { id: 'MANO', name: 'Cuff manometer', size: 1, description: 'Measure airway tube cuff pressure.', icon: 'gauge', color: '#C9A227' },
+]
+
+const nursingTools = [
+  { id: 'IVK', name: 'IV start kit', size: 1, description: 'Prepare supplies for peripheral IV access.', icon: 'kit', color: '#38D6E0' },
+  { id: 'ABX', name: 'Antibiotic', size: 1, description: 'Administer the ordered antimicrobial dose.', icon: 'vial', color: '#8FE04A' },
+  { id: 'FLUID', name: 'Fluid bag', size: 2, description: 'Give the ordered IV fluid bolus.', icon: 'tubeBag', color: '#6BB8F2' },
+  { id: 'PRESS', name: 'Pressor', size: 1, description: 'Support blood pressure with the ordered infusion.', icon: 'vial', color: '#F2B33D' },
+  { id: 'FOLEY', name: 'Foley kit', size: 2, description: 'Place a urinary catheter and drainage bag.', icon: 'foley', color: '#38D6E0' },
+  { id: 'NGT', name: 'NG tube', size: 1, description: 'Place a tube for enteral access or decompression.', icon: 'airway', color: '#7FD4E0' },
+  { id: 'BCULT', name: 'Blood cultures', size: 1, description: 'Collect cultures for the infection workup.', icon: 'samples', color: '#C96BD8' },
+  { id: 'GLUC', name: 'Glucometer', size: 1, description: 'Check the patient’s blood glucose.', icon: 'meter', color: '#8FE04A' },
+  { id: 'INSUL', name: 'Insulin', size: 1, description: 'Give the ordered insulin dose.', icon: 'syringe', color: '#F2B33D' },
+  { id: 'LEADS', name: 'ECG leads', size: 1, description: 'Connect the patient to cardiac monitoring.', icon: 'ecg', color: '#38D6E0' },
+  { id: 'DRESS', name: 'Dressing kit', size: 1, description: 'Clean and dress the wound site.', icon: 'dressing', color: '#6BB8F2' },
+  { id: 'PAIN', name: 'Analgesia', size: 1, description: 'Give the ordered pain medication.', icon: 'capsule', color: '#C96BD8' },
+  { id: 'TURN', name: 'Slide sheet', size: 2, description: 'Reposition the patient with assisted movement.', icon: 'sheet', color: '#7FD4E0' },
+  { id: 'CHART', name: 'Chart', size: 1, description: 'Record the care step and patient response.', icon: 'chart', color: '#F2B33D' },
+  { id: 'BLOOD', name: 'Blood unit', size: 1, description: 'Hang the ordered blood product.', icon: 'blood', color: '#C43A44' },
+  { id: 'SUPP', name: 'Suppository', size: 1, description: 'Administer the ordered rectal medication.', icon: 'suppository', color: '#8FE04A' },
+]
 
 const missionSpecs = [
   { label: 'Platform', value: 'Any browser' },
@@ -254,23 +227,24 @@ export default async function Home() {
           className="pointer-events-none absolute inset-0 z-0"
           style={{ background: 'linear-gradient(to bottom, transparent 30%, rgba(6, 9, 12, 0.55) 72%, #06090c 100%)' }}
         />
-        <div className="absolute inset-x-0 bottom-0 z-10 px-4 py-5 sm:px-6 md:px-8 xl:px-10">
-          <div className="mx-auto flex max-w-[760px] flex-col items-center gap-3">
-            <div className="flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
-              <Link
-                href={user ? '/play?level=1' : '/auth/login?mode=signup'}
-                className="inline-flex min-h-[52px] items-center justify-center rounded-[4px] px-7 text-[11px] font-black uppercase tracking-[3px] text-[#06090c] shadow-[0_12px_30px_rgba(53,224,127,0.28)] transition hover:-translate-y-0.5 hover:brightness-105"
-                style={{ background: 'linear-gradient(180deg,#6FE0A8 0%,#2BA86B 100%)' }}
-              >
-                {user ? 'Play Level 1 Free' : 'Sign Up to Play Level 1 Free'}
-              </Link>
+      </section>
 
-              <div className="inline-flex min-h-[52px] items-center justify-center">
-                <BuyButton userId={user?.id} hasPurchased={access.allowed} />
-              </div>
+      <section className="border-b border-[#163040] bg-[#06090c] px-4 py-6 sm:px-6 md:px-8 xl:px-10">
+        <div className="mx-auto flex max-w-[760px] flex-col items-center gap-3">
+          <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
+            <Link
+              href={user ? '/play?level=1' : '/auth/login?mode=signup'}
+              className="inline-flex min-h-[52px] w-full items-center justify-center rounded-[4px] px-3 text-center text-[11px] font-black uppercase tracking-[3px] text-[#06090c] shadow-[0_12px_30px_rgba(53,224,127,0.28)] transition hover:-translate-y-0.5 hover:brightness-105"
+              style={{ background: 'linear-gradient(180deg,#6FE0A8 0%,#2BA86B 100%)' }}
+            >
+              {user ? 'Play Level 1 Free' : 'Sign Up to Play Level 1 Free'}
+            </Link>
+
+            <div className="w-full">
+              <BuyButton userId={user?.id} hasPurchased={access.allowed} />
             </div>
-            {!access.allowed && <PurchaseNote />}
           </div>
+          {!access.allowed && <PurchaseNote />}
         </div>
       </section>
 
@@ -325,41 +299,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="bg-[#0a0d10] px-4 py-14 sm:px-6 md:px-8 lg:py-20">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="mb-3 text-[11px] font-black uppercase tracking-[3px] text-[#d6b36b]">Field Guide</p>
-              <h2 className="text-3xl font-black uppercase text-white md:text-4xl">Choose the gear that survives the shift.</h2>
-            </div>
-            <div className="flex flex-wrap gap-3 text-[10px] font-black uppercase tracking-[2px] text-[#ced7dd]">
-              <span className="rounded-full border border-[#2a3c47] bg-[#0d1b20] px-3 py-2 text-[#38d6e0]">Power-ups</span>
-              <span className="rounded-full border border-[#403425] bg-[#1d160f] px-3 py-2 text-[#d6b36b]">Permanent upgrades</span>
-            </div>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {fieldGuide.map((item) => (
-              <article
-                key={item.name}
-                className="flex min-h-[220px] flex-col rounded-[8px] border border-[#2a2f34] bg-[#0d1115] p-4 shadow-[0_18px_40px_rgba(0,0,0,0.14)]"
-              >
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[6px] border border-[#2a2f34] bg-[#111a1e]">
-                    <ItemIcon icon={item.icon} color={item.color} />
-                  </div>
-                  <span className={`text-right text-[9px] font-black uppercase tracking-[1.5px] ${item.category === 'Permanent upgrade' ? 'text-[#d6b36b]' : 'text-[#38d6e0]'}`}>
-                    {item.category}
-                  </span>
-                </div>
-                <h3 className="text-base font-black uppercase leading-tight text-white">{item.name}</h3>
-                <p className="mt-1 text-[11px] font-bold uppercase tracking-[1px] text-[#d6b36b]">{item.price}</p>
-                <p className="mt-2 text-xs leading-5 text-[#9eaab0]">{item.description}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+      <FieldGuideTabs powerUps={fieldGuide} respiratoryTools={respiratoryTools} nursingTools={nursingTools} />
 
       <section className="border-t border-[#2a2e31] bg-[#0f1417] px-4 py-10 sm:px-6 md:px-8">
         <div className="mx-auto flex max-w-6xl flex-wrap gap-x-10 gap-y-4">

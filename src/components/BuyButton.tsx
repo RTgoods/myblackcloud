@@ -39,6 +39,11 @@ export function BuyButton({ userId, hasPurchased }: Props) {
     letterSpacing: 3,
     padding: '16px 28px',
     minHeight: 52,
+    width: '100%',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    lineHeight: 1.2,
     fontWeight: 900,
     textTransform: 'uppercase',
     border: 'none',
@@ -49,7 +54,7 @@ export function BuyButton({ userId, hasPurchased }: Props) {
 
   if (hasPurchased) {
     return (
-      <div className="text-center">
+      <div className="w-full text-center">
         <a href="/game" className="inline-block" style={buttonStyle}>▶ Start Your Shift</a>
         <p className="mt-2 text-[10px] tracking-[2px] uppercase" style={{ color: '#35E07F' }}>All 8 levels unlocked</p>
       </div>
@@ -57,7 +62,7 @@ export function BuyButton({ userId, hasPurchased }: Props) {
   }
 
   return (
-    <div className="text-center">
+    <div className="w-full text-center">
       <button onClick={handleBuy} disabled={loading} style={buttonStyle}>
         {loading ? 'Redirecting…' : `Unlock Full Shift — ${formatPrice()}`}
       </button>
