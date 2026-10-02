@@ -2661,7 +2661,6 @@ const DECK_RN=[
 const SFX=(function(){
   let ac=null, master=null, muted=false, ready=false;
   let bedBus=null, alarmBus=null, uiBus=null, ambBus=null;
-  let hum=null, humGain=null;
 
   function init(){
     if(ready) return true;
@@ -2684,19 +2683,6 @@ const SFX=(function(){
       g.connect(master); g.connect(conv); return g; }
     bedBus=bus(0.85); alarmBus=bus(1.0); uiBus=bus(0.95); ambBus=bus(0.45);
 
-    // the building itself
-    hum=ac.createOscillator(); hum.type="sine"; hum.frequency.value=54;
-    humGain=ac.createGain(); humGain.gain.value=0.30;
-    const hf=ac.createBiquadFilter(); hf.type="lowpass"; hf.frequency.value=180;
-    hum.connect(hf); hf.connect(humGain); humGain.connect(ambBus); hum.start();
-    // air handling
-    const nb=ac.createBuffer(1,ac.sampleRate*2,ac.sampleRate);
-    const nd=nb.getChannelData(0);
-    for(let i=0;i<nd.length;i++) nd[i]=Math.random()*2-1;
-    const air=ac.createBufferSource(); air.buffer=nb; air.loop=true;
-    const af=ac.createBiquadFilter(); af.type="bandpass"; af.frequency.value=420; af.Q.value=0.6;
-    const ag=ac.createGain(); ag.gain.value=0.13;
-    air.connect(af); af.connect(ag); ag.connect(ambBus); air.start();
 
     ready=true;
     // browsers hand back a suspended context until a gesture unlocks it
@@ -2812,10 +2798,9 @@ const SFX=(function(){
     fail(){ [420,330,250].forEach(function(f,i){
       setTimeout(function(){beep(f,0.26,0.374,"sawtooth");},i*150); }); },
 
-    // the building responds to how bad the shift is going
-    tension(x){ if(!ready) return;
-      humGain.gain.value=0.24+x*0.34;
-      hum.frequency.value=54+x*16; },
+    // the background hum/air-handling ambience was removed — tension() is now a no-op
+    // kept so existing call sites don't need to change.
+    tension(){},
     blackout(on2){ if(!ready) return;
       ambBus.gain.value= on2?0.12:0.45;
       bedBus.gain.value= on2?0.45:0.85; }
