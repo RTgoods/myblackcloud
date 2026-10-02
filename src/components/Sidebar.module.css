@@ -1,0 +1,211 @@
+.drawer {
+  background: linear-gradient(180deg, var(--site-panel) 0%, var(--background) 72%);
+  border-right: 1px solid var(--site-border);
+}
+
+.drawerOpen {
+  width: 264px;
+  padding: 20px 16px;
+}
+
+.drawerCollapsed {
+  width: 56px;
+  padding: 20px 8px;
+}
+
+.mobileToggle,
+.collapseButton {
+  background: var(--site-panel);
+  border: 1px solid var(--site-border);
+  color: var(--site-teal);
+}
+
+.mobileToggle {
+  font-size: 18px;
+}
+
+.collapseButton {
+  font-size: 16px;
+}
+
+.backdrop {
+  background: rgb(0 0 0 / 60%);
+  border: 0;
+}
+
+.brandRow {
+  border-bottom: 1px solid var(--site-border);
+}
+
+.brand {
+  color: var(--site-teal);
+  font-size: 17px;
+  letter-spacing: 1px;
+}
+
+.accountCard {
+  background: var(--site-panel);
+  border: 1px solid var(--site-border);
+}
+
+.avatar {
+  background: var(--background);
+  border: 1px solid #2c4147;
+}
+
+.accountName {
+  color: var(--foreground);
+}
+
+.accountStatus,
+.settingsLink,
+.directoryHeading,
+.footer {
+  color: var(--site-muted);
+}
+
+.unlockedText,
+.playLink {
+  color: var(--site-green);
+}
+
+.accountAction {
+  background: #0c171a;
+  border: 1px solid #2c4147;
+  color: var(--foreground);
+}
+
+.accountAction :global(button),
+.accountAction a {
+  color: inherit;
+  display: block;
+  width: 100%;
+  text-decoration: none;
+}
+
+.signOutButton {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.signOutButton:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.nav,
+.directory {
+  border-top: 1px solid var(--site-border);
+}
+
+.nav {
+  color: var(--site-secondary);
+}
+
+.navLink,
+.footer a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.playLink {
+  text-decoration: none;
+}
+
+.directoryHeading {
+  color: var(--site-muted);
+}
+
+.levelSection {
+  border-bottom: 1px solid var(--site-border);
+}
+
+.levelButton {
+  padding-left: 8px;
+  border-left: 2px solid transparent;
+  background: transparent;
+}
+
+.levelCompleted {
+  border-left-color: var(--site-gold);
+  background: linear-gradient(90deg, rgb(201 162 39 / 10%), transparent 80%);
+}
+
+.levelPlayable {
+  border-left-color: var(--site-teal);
+  background: linear-gradient(90deg, rgb(56 214 224 / 7%), transparent 80%);
+}
+
+.levelLocked {
+  border-left-color: transparent;
+}
+
+.levelMarker {
+  background: var(--site-panel);
+}
+
+.markerCompleted {
+  color: var(--site-gold);
+  border-color: #8c7425;
+  background: rgb(201 162 39 / 8%);
+}
+
+.markerPlayable {
+  color: var(--site-teal);
+  border-color: #28505a;
+}
+
+.markerLocked,
+.lockedText {
+  color: var(--site-muted);
+}
+
+.completedText {
+  color: var(--site-gold);
+}
+
+.completedSubtitle {
+  color: #a98d2b;
+}
+
+.playableText {
+  color: var(--site-teal);
+}
+
+.playableSubtitle {
+  color: var(--foreground);
+}
+
+.chevron {
+  color: var(--site-secondary);
+}
+
+.levelNote {
+  color: #81909c;
+}
+
+.statsLabel {
+  color: var(--site-muted);
+}
+
+.statsValue {
+  color: var(--foreground);
+}
+
+.toolList {
+  color: var(--site-secondary);
+}
+
+.playAction {
+  color: var(--background);
+  background: linear-gradient(180deg, var(--site-green), #23a95e);
+  border-color: var(--site-green);
+  text-decoration: none;
+}
+
+.footer {
+  border-top: 1px solid var(--site-border);
+}

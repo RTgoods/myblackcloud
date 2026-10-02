@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { SignOutButton } from './SignOutButton'
 import type { LevelStat } from '@/types/database'
+import styles from './Sidebar.module.css'
 import rtMale from '../../public/images/characters/rt-male-face.webp'
 import rtFemale from '../../public/images/characters/rt-female-face.webp'
 import nurseMale from '../../public/images/characters/nurse-male-face.webp'
@@ -92,8 +93,7 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
           onClick={() => setOpen(true)}
           aria-label="Open menu"
           aria-expanded={open}
-          className="md:hidden fixed top-3 left-3 z-50 w-9 h-9 rounded-md"
-          style={{ background: '#0b1420', border: '1px solid #1c3a42', color: '#38D6E0', fontSize: 18 }}
+          className={`${styles.mobileToggle} md:hidden fixed top-3 left-3 z-50 w-9 h-9 rounded-md`}
         >
           ☰
         </button>
@@ -103,25 +103,18 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
         <button
           onClick={close}
           aria-label="Close menu"
-          className="md:hidden fixed inset-0 z-40"
-          style={{ background: 'rgba(0,0,0,0.6)', border: 'none' }}
+          className={`${styles.backdrop} md:hidden fixed inset-0 z-40`}
         />
       )}
 
       <aside
-        className={`fixed md:sticky top-0 left-0 h-screen z-50 md:z-auto flex flex-col shrink-0 transition-all duration-200 overflow-y-auto ${open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
-        style={{
-          width: open ? 264 : 56,
-          background: 'linear-gradient(180deg,#0b1420,#06090c 42%)',
-          borderRight: '1px solid #163040',
-          padding: open ? '20px 16px' : '20px 8px',
-        }}
+        className={`${styles.drawer} ${open ? styles.drawerOpen : styles.drawerCollapsed} fixed md:sticky top-0 left-0 h-screen z-50 md:z-auto flex flex-col shrink-0 transition-all duration-200 overflow-y-auto ${open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
         aria-label="Site navigation"
       >
-        <div className="flex items-center justify-between gap-2 pb-4" style={{ borderBottom: '1px solid #163040' }}>
+        <div className={`${styles.brandRow} flex items-center justify-between gap-2 pb-4`}>
           {open && (
             <Link href="/" onClick={closeOnMobile} className="block min-w-0">
-              <span className="block font-black uppercase leading-tight" style={{ color: '#38D6E0', letterSpacing: 1, fontSize: 17 }}>
+              <span className={`${styles.brand} block font-black uppercase leading-tight`}>
                 My Black Cloud
               </span>
             </Link>
@@ -130,8 +123,7 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
             onClick={() => setOpen((o) => !o)}
             aria-label={open ? 'Collapse menu' : 'Expand menu'}
             aria-expanded={open}
-            className="shrink-0 w-8 h-8 rounded-md"
-            style={{ background: '#0b1420', border: '1px solid #1c3a42', color: '#38D6E0', fontSize: 16 }}
+            className={`${styles.collapseButton} shrink-0 w-8 h-8 rounded-md`}
           >
             ☰
           </button>
@@ -140,43 +132,38 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
         {open && (
           <>
             <div className="mt-4 mb-2 flex flex-col gap-2 text-[11px]">
-              {email ? (
-                <>
-                  <div className="flex items-center gap-3">
-                    <span className="relative block shrink-0 overflow-hidden rounded-full" style={{ width: 44, height: 44, border: '1px solid #1c3a42', background: '#081019' }}>
-                      <Image src={portrait} alt="" fill className="object-cover" sizes="44px" />
-                    </span>
-                    <p className="min-w-0 flex-1 text-[15px] font-bold" style={{ color: unlocked ? '#35E07F' : '#9eaab0', wordBreak: 'break-all' }}>{name}</p>
-                    <Link
-                      href="/settings" onClick={closeOnMobile}
-                      className="shrink-0 text-[10px] uppercase tracking-[1px]" style={{ color: '#5c6d7a' }}
-                    >
-                      Settings
-                    </Link>
-                  </div>
-                  <p style={{ color: '#5C6D7A' }}>{unlocked ? 'All levels unlocked' : 'Level 1 free'}</p>
-                  <SignOutButton />
-                </>
-              ) : (
-                <>
-                  <p style={{ color: '#6ec9e0' }}>Guest · Level 1 free</p>
-                  <Link
-                    href="/auth/login" onClick={closeOnMobile}
-                    style={{ color: '#bfe9f0', border: '1px solid #1c3a42', background: '#0d1b20', display: 'block', padding: '10px 8px', borderRadius: 4, textAlign: 'center', fontSize: 10, letterSpacing: 1, textTransform: 'uppercase' }}
-                  >
+              <div className={`${styles.accountCard} flex items-center gap-3 rounded-[4px] p-3`}>
+                <span className={`${styles.avatar} relative block h-10 w-10 shrink-0 overflow-hidden rounded-full`}>
+                  <Image src={portrait} alt="" fill className="object-cover" sizes="40px" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className={`${styles.accountName} ${email && unlocked ? styles.unlockedText : ''} truncate text-sm font-bold`}>{name ?? 'Guest'}</p>
+                  <p className={`${styles.accountStatus} ${email && unlocked ? styles.unlockedText : ''} mt-1 text-[10px]`}>
+                    {email ? unlocked ? 'All levels unlocked' : 'Level 1 free' : 'Level 1 free'}
+                  </p>
+                </div>
+                {email && (
+                  <Link href="/settings" onClick={closeOnMobile} className={`${styles.settingsLink} shrink-0 text-[10px] uppercase tracking-[1px]`}>
+                    Settings
+                  </Link>
+                )}
+              </div>
+              <div className={`${styles.accountAction} rounded-[4px] px-2 py-2.5 text-center text-[10px] font-bold uppercase tracking-[1px]`}>
+                {email ? <SignOutButton /> : (
+                  <Link href="/auth/login" onClick={closeOnMobile} className="block">
                     Sign In / Sign Up
                   </Link>
-                </>
-              )}
+                )}
+              </div>
             </div>
 
-            <nav className="flex flex-col gap-3 mt-4 pt-4 text-[11px] uppercase tracking-[1px]" style={{ borderTop: '1px solid #163040', color: '#9eaab0' }}>
-              <Link href="/play" onClick={closeOnMobile} style={{ color: '#38D6E0' }}>Play SHIFT</Link>
-              <Link href="/leaderboard" onClick={closeOnMobile} style={{ color: 'inherit' }}>Leaderboard</Link>
+            <nav className={`${styles.nav} flex flex-col gap-3 mt-4 pt-4 text-[11px] uppercase tracking-[1px]`}>
+              <Link href="/play" onClick={closeOnMobile} className={styles.playLink}>Play SHIFT</Link>
+              <Link href="/leaderboard" onClick={closeOnMobile} className={styles.navLink}>Leaderboard</Link>
             </nav>
 
-            <div className="mt-4 pt-4" style={{ borderTop: '1px solid #163040' }}>
-              <div className="mb-2 flex items-center justify-between text-[10px] font-black uppercase tracking-[2px]" style={{ color: '#5c6d7a' }}>
+            <div className={`${styles.directory} mt-4 pt-4`}>
+              <div className={`${styles.directoryHeading} mb-2 flex items-center justify-between text-[10px] font-black uppercase tracking-[2px]`}>
                 <span>Shift Directory</span>
                 <span>01 - 08</span>
               </div>
@@ -189,33 +176,28 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
                     .find((previous) => !savedCompletedLevels.includes(previous))
                   const stats = savedLevelStats[String(n)]
                   return (
-                    <section key={n} className="border-b border-[#163040]">
+                    <section key={n} className={styles.levelSection}>
                       <button
                         type="button"
                         aria-expanded={expanded}
                         aria-controls={`level-details-${n}`}
                         onClick={() => setExpandedLevel(expanded ? null : n)}
-                        className="flex min-h-[66px] w-full items-center gap-3 py-2 text-left"
+                        className={`${styles.levelButton} ${completed ? styles.levelCompleted : playable ? styles.levelPlayable : styles.levelLocked} flex min-h-[66px] w-full items-center gap-3 py-2 text-left`}
                       >
                         <span
-                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] border text-sm font-black"
-                          style={{
-                            color: completed ? '#F2C94D' : playable ? '#38D6E0' : '#5c6d7a',
-                            borderColor: completed ? '#806B24' : '#1c3a42',
-                            background: '#081019',
-                          }}
+                          className={`${styles.levelMarker} ${completed ? styles.markerCompleted : playable ? styles.markerPlayable : styles.markerLocked} flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] border text-sm font-black`}
                         >
                           {completed ? '✓' : `S${n}`}
                         </span>
                         <span className="flex min-w-0 flex-1 flex-col gap-1">
-                          <span className="text-[11px] font-black uppercase tracking-[2px]" style={{ color: completed ? '#F2C94D' : playable ? '#38D6E0' : '#5c6d7a' }}>
+                          <span className={`${styles.levelName} ${completed ? styles.completedText : playable ? styles.playableText : styles.lockedText} text-[11px] font-black uppercase tracking-[2px]`}>
                             {completed ? 'Cleared' : `Level ${n}`}
                           </span>
-                          <span className="text-[11px] font-bold uppercase tracking-[1px]" style={{ color: completed ? '#b99d35' : playable ? '#dfeaf4' : '#657485' }}>
+                          <span className={`${styles.levelSubtitle} ${completed ? styles.completedSubtitle : playable ? styles.playableSubtitle : styles.lockedText} text-[11px] font-bold uppercase tracking-[1px]`}>
                             {completed ? `Shift ${n} complete` : playable ? 'Ready to play' : firstIncompletePriorLevel ? `Clear level ${firstIncompletePriorLevel} first` : 'Unlock full shift'}
                           </span>
                         </span>
-                        <span aria-hidden="true" className="text-lg" style={{ color: playable ? '#9eaab0' : '#5c6d7a' }}>{expanded ? '⌄' : '›'}</span>
+                        <span aria-hidden="true" className={`${styles.chevron} text-lg`}>{expanded ? '⌄' : '›'}</span>
                       </button>
 
                       {expanded && (
@@ -224,36 +206,36 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
                             <>
                               <div className="grid grid-cols-2 gap-x-3 gap-y-2">
                                 <div>
-                                  <p className="text-[9px] font-bold uppercase tracking-[1.5px]" style={{ color: '#5c6d7a' }}>Score</p>
-                                  <p className="mt-1 text-[11px] font-bold" style={{ color: '#dfeaf4' }}>{stats.totalDischarged} discharged</p>
+                                  <p className={`${styles.statsLabel} text-[9px] font-bold uppercase tracking-[1.5px]`}>Score</p>
+                                  <p className={`${styles.statsValue} mt-1 text-[11px] font-bold`}>{stats.totalDischarged} discharged</p>
                                 </div>
                                 <div>
-                                  <p className="text-[9px] font-bold uppercase tracking-[1.5px]" style={{ color: '#5c6d7a' }}>Time</p>
-                                  <p className="mt-1 text-[11px] font-bold" style={{ color: '#dfeaf4' }}>{formatLevelDuration(stats.durationSeconds)}</p>
+                                  <p className={`${styles.statsLabel} text-[9px] font-bold uppercase tracking-[1.5px]`}>Time</p>
+                                  <p className={`${styles.statsValue} mt-1 text-[11px] font-bold`}>{formatLevelDuration(stats.durationSeconds)}</p>
                                 </div>
                                 <div>
-                                  <p className="text-[9px] font-bold uppercase tracking-[1.5px]" style={{ color: '#5c6d7a' }}>Coins earned</p>
-                                  <p className="mt-1 text-[11px] font-bold" style={{ color: '#dfeaf4' }}>{stats.coinsEarned ?? 'Not recorded'}</p>
+                                  <p className={`${styles.statsLabel} text-[9px] font-bold uppercase tracking-[1.5px]`}>Coins earned</p>
+                                  <p className={`${styles.statsValue} mt-1 text-[11px] font-bold`}>{stats.coinsEarned ?? 'Not recorded'}</p>
                                 </div>
                               </div>
                               <div className="mt-3">
-                                <p className="text-[9px] font-bold uppercase tracking-[1.5px]" style={{ color: '#5c6d7a' }}>Favorite tools</p>
+                                <p className={`${styles.statsLabel} text-[9px] font-bold uppercase tracking-[1.5px]`}>Favorite tools</p>
                                 {stats.favoriteTools?.length ? (
                                   <ol className="mt-1 space-y-1">
                                     {stats.favoriteTools.slice(0, 3).map((tool) => (
-                                      <li key={tool.name} className="flex justify-between gap-2 text-[10px]" style={{ color: '#9eaab0' }}>
+                                      <li key={tool.name} className={`${styles.toolList} flex justify-between gap-2 text-[10px]`}>
                                         <span className="truncate">{tool.name}</span>
                                         <span className="shrink-0">{tool.uses}x</span>
                                       </li>
                                     ))}
                                   </ol>
-                                ) : <p className="mt-1 text-[10px]" style={{ color: '#81909c' }}>Not recorded</p>}
+                                ) : <p className={`${styles.levelNote} mt-1 text-[10px]`}>Not recorded</p>}
                               </div>
                             </>
                           ) : completed ? (
-                            <p className="text-[10px] leading-5" style={{ color: '#81909c' }}>Detailed results are available for levels completed after this update.</p>
+                            <p className={`${styles.levelNote} text-[10px] leading-5`}>Detailed results are available for levels completed after this update.</p>
                           ) : !playable ? (
-                            <p className="text-[10px] leading-5" style={{ color: '#81909c' }}>
+                            <p className={`${styles.levelNote} text-[10px] leading-5`}>
                               {firstIncompletePriorLevel ? `Complete level ${firstIncompletePriorLevel} before this shift.` : 'Unlock the full shift to play this level.'}
                             </p>
                           ) : null}
@@ -261,8 +243,7 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
                             <Link
                               href={`/play?level=${n}`}
                               onClick={closeOnMobile}
-                              className="mt-3 flex min-h-10 w-full items-center justify-center rounded-[3px] border text-[10px] font-black uppercase tracking-[2px]"
-                              style={{ color: '#06090c', background: '#38D6E0', borderColor: '#38D6E0' }}
+                              className={`${styles.playAction} mt-3 flex min-h-10 w-full items-center justify-center rounded-[3px] border text-[10px] font-black uppercase tracking-[2px]`}
                             >
                               {completed ? 'Replay level' : 'Play level'}
                             </Link>
@@ -275,9 +256,9 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
               </div>
             </div>
 
-            <div className="mt-auto pt-4 flex gap-4 text-[10px]" style={{ borderTop: '1px solid #163040', color: '#5c6d7a' }}>
-              <Link href="/privacy" onClick={closeOnMobile} style={{ color: 'inherit' }}>Privacy</Link>
-              <Link href="/terms" onClick={closeOnMobile} style={{ color: 'inherit' }}>Terms</Link>
+            <div className={`${styles.footer} mt-auto pt-4 flex gap-4 text-[10px]`}>
+              <Link href="/privacy" onClick={closeOnMobile}>Privacy</Link>
+              <Link href="/terms" onClick={closeOnMobile}>Terms</Link>
             </div>
           </>
         )}

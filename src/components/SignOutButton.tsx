@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import styles from './Sidebar.module.css'
 
 export function SignOutButton() {
   const [loading, setLoading] = useState(false)
@@ -18,7 +19,7 @@ export function SignOutButton() {
   }
 
   return (
-    <button onClick={signOut} disabled={loading} style={{ color: 'inherit', background: 'none', border: 'none', padding: 0, cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.6 : 1 }}>
+    <button onClick={signOut} disabled={loading} className={styles.signOutButton}>
       {loading ? 'Signing out…' : 'Sign Out'}
     </button>
   )

@@ -3,6 +3,13 @@
 :root {
   --background: #06090c;
   --foreground: #dfeaf4;
+  --site-panel: #0c1116;
+  --site-border: #1d2831;
+  --site-teal: #38d6e0;
+  --site-green: #35e07f;
+  --site-gold: #c9a227;
+  --site-muted: #5c6d7a;
+  --site-secondary: #9eaab0;
 }
 
 @theme inline {
