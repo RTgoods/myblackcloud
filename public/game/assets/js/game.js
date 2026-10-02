@@ -298,7 +298,7 @@ let events=[], evRoll=0, coins=0, partyP=0, dance=0, streamers=[], banner="", ba
 let levelCoinsEarned=0, levelToolUses={};
 function awardCoins(amount){coins+=amount;levelCoinsEarned+=amount;}
 let cloudUsed=false, swarm=0, shouts=[];
-let powers=[], pwSig=null, friend=null, packSig=null, od=null, odP=0;
+let powers=[], pwSig=null, friend=null, packSig=null, detailSig=null, od=null, odP=0;
 let ppe=false, ppeP=0, orPt=null, orP=0, recP=0, ppeWarn=0, ppeUsed=false;
 let high=0, narcan=null, holdBlip=0, wheelT=0;
 let spark=null, sparkP=0;
@@ -7000,18 +7000,24 @@ function hud(){
     pr.style.width = (b.careMax? (b.stage/b.careMax*100):0)+"%";
   });
   const b=beds[sel];
-  if(!b||!b.p) detEl.innerHTML='<div class="empty">No patients on the board.</div>';
-  else if(b.state==="ready") detEl.innerHTML=
+  if(!b||!b.p){ detailSig=null; detEl.innerHTML='<div class="empty">No patients on the board.</div>'; }
+  else if(b.state==="ready"){
+    detailSig=null;
+    detEl.innerHTML=
     who(b)+
     '<div class="dx" style="color:'+(b.t<READY_T*0.34?'var(--crit)':'var(--hr)')+'">Bed '+b.room.id+
       ' · READY FOR DISCHARGE <span>· '+Math.ceil(Math.max(0,b.t))+'s</span></div>'+
     '<div class="note">'+(b.t<READY_T*0.34
       ? "He's been waiting too long and is starting to slip. Move him now or he relapses."
       : "Care is done. Fetch a wheelchair, load him at the bedside, then wheel him to the waiting room and stand on SEND HOME.")+'</div>';
-  else if(b.state==="code") detEl.innerHTML=
+  }
+  else if(b.state==="code"){
+    detailSig=null;
+    detEl.innerHTML=
     who(b)+
     '<div class="dx">Bed '+b.room.id+' · CODE BLUE <span>· '+Math.ceil(b.t)+'s</span></div>'+
     '<div class="note">Find the crash cart, get it onto the drop zone. Everyone is in your way.</div>';
+  }
   else {
     const remain=b.careMax-b.stage;
     let segs="";
@@ -7020,15 +7026,27 @@ function hud(){
       const tone = remain===1?" low" : remain===2?" mid" : "";
       segs += '<i class="'+(on?"on"+tone:"")+'"></i>';
     }
-    detEl.innerHTML=
-      who(b)+
-      '<div class="dx">Bed '+b.room.id+' · '+b.p.dx+' <span>· '+Math.ceil(b.t)+'s</span></div>'+
-      '<div id="care"><span class="lbl">CARE NEEDS</span><span class="seg">'+segs+'</span></div>'+
-      '<div class="stage">Step '+(b.stage+1)+' of '+b.careMax+' — '+b.p.sn+'</div>'+
-      '<div class="needs">'+b.p.need.map(function(k){
-        const s=b.got.indexOf(k)>=0?"done":pack.indexOf(k)>=0?"carry":"";
-        return '<span class="need '+s+'"><img loading="lazy" decoding="async" src="'+ICONS[k]+'" alt="">'+TOOLS[k].n+'</span>';}).join("")+'</div>'+
-      '<div class="note">'+b.p.note+'</div>';
+    // Needs badges carry real (network-loaded) icon images now, not instant data
+    // URLs — rebuilding this innerHTML every frame (hud() runs in the game loop)
+    // tore the <img> tags down before they could ever finish loading. Only
+    // rebuild when something that actually changes the content changes; just
+    // patch the live countdown text the rest of the time.
+    const sig=sel+"|"+b.room.id+"|"+b.stage+"|"+b.got.join(",")+"|"+pack.join(",")+"|"+b.p.need.join(",");
+    if(detailSig!==sig){
+      detailSig=sig;
+      detEl.innerHTML=
+        who(b)+
+        '<div class="dx">Bed '+b.room.id+' · '+b.p.dx+' <span class="dxTimer">· '+Math.ceil(b.t)+'s</span></div>'+
+        '<div id="care"><span class="lbl">CARE NEEDS</span><span class="seg">'+segs+'</span></div>'+
+        '<div class="stage">Step '+(b.stage+1)+' of '+b.careMax+' — '+b.p.sn+'</div>'+
+        '<div class="needs">'+b.p.need.map(function(k){
+          const s=b.got.indexOf(k)>=0?"done":pack.indexOf(k)>=0?"carry":"";
+          return '<span class="need '+s+'"><img loading="lazy" decoding="async" src="'+ICONS[k]+'" alt="">'+TOOLS[k].n+'</span>';}).join("")+'</div>'+
+        '<div class="note">'+b.p.note+'</div>';
+    } else {
+      const timerEl=detEl.querySelector(".dxTimer");
+      if(timerEl) timerEl.textContent="· "+Math.ceil(b.t)+"s";
+    }
   }
   const row=document.getElementById("packRow"),sl=document.getElementById("slots");
   const psig=pack.join(",");
