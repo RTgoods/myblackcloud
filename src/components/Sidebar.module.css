@@ -70,8 +70,18 @@
 }
 
 .accountAction {
+  border: 1px solid var(--site-border);
+}
+
+.accountActionPrimary {
+  background: linear-gradient(180deg, #6fe0a8 0%, #2ba86b 100%);
+  border-color: #2ba86b;
+  color: var(--background);
+}
+
+.accountActionSecondary {
   background: #0c171a;
-  border: 1px solid #2c4147;
+  border-color: #2c4147;
   color: var(--foreground);
 }
 
@@ -130,8 +140,8 @@
 }
 
 .levelCompleted {
-  border-left-color: var(--site-gold);
-  background: linear-gradient(90deg, rgb(201 162 39 / 10%), transparent 80%);
+  border-left-color: var(--site-green);
+  background: linear-gradient(90deg, rgb(53 224 127 / 10%), transparent 80%);
 }
 
 .levelPlayable {
@@ -148,9 +158,9 @@
 }
 
 .markerCompleted {
-  color: var(--site-gold);
-  border-color: #8c7425;
-  background: rgb(201 162 39 / 8%);
+  color: var(--site-green);
+  border-color: var(--site-green);
+  background: rgb(53 224 127 / 8%);
 }
 
 .markerPlayable {
@@ -164,11 +174,11 @@
 }
 
 .completedText {
-  color: var(--site-gold);
+  color: var(--site-green);
 }
 
 .completedSubtitle {
-  color: #a98d2b;
+  color: #a5e7be;
 }
 
 .playableText {
@@ -201,8 +211,8 @@
 
 .playAction {
   color: var(--background);
-  background: linear-gradient(180deg, var(--site-green), #23a95e);
-  border-color: var(--site-green);
+  background: linear-gradient(180deg, #6fe0a8 0%, #2ba86b 100%);
+  border-color: #2ba86b;
   text-decoration: none;
 }
 

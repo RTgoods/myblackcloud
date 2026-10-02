@@ -148,7 +148,7 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
                   </Link>
                 )}
               </div>
-              <div className={`${styles.accountAction} rounded-[4px] px-2 py-2.5 text-center text-[10px] font-bold uppercase tracking-[1px]`}>
+              <div className={`${styles.accountAction} ${email ? styles.accountActionSecondary : styles.accountActionPrimary} rounded-[4px] px-2 py-2.5 text-center text-[10px] font-bold uppercase tracking-[1px]`}>
                 {email ? <SignOutButton /> : (
                   <Link href="/auth/login" onClick={closeOnMobile} className="block">
                     Sign In / Sign Up
