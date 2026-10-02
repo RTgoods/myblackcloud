@@ -4963,21 +4963,21 @@ function drawCart(x,y,glow){
 function drawFace(x,y,r,skin,hair,mood,opt){ drawFaceOn(g,x,y,r,skin,hair,mood,opt); }
 function drawFaceOn(g,x,y,r,skin,hair,mood,opt){
   // a longer, gaunter head than the staff — these people have been here a while
-  const H=r*1.22, W=r*0.80;
+  const H=r*1.1, W=r*0.84;
   const seed=(x*0.37+y*0.11);
   function jt(i){ const v=Math.sin(seed*13.1+i*57.7)*43758.5453; return (v-Math.floor(v))-0.5; }
 
   g.fillStyle=skin;
   g.beginPath();
-  g.moveTo(0*0+x, y-H);
+  g.moveTo(x, y-H);
   g.bezierCurveTo(x+W*1.05, y-H*0.78, x+W*1.0,  y+H*0.30, x+W*0.52, y+H*0.80);
   g.bezierCurveTo(x+W*0.24, y+H*1.02, x-W*0.24, y+H*1.02, x-W*0.52, y+H*0.80);
   g.bezierCurveTo(x-W*1.0,  y+H*0.30, x-W*1.05, y-H*0.78, x, y-H);
   g.closePath();g.fill();
-  // hollow under the cheeks
-  g.fillStyle="rgba(90,60,45,.13)";
-  g.beginPath();g.ellipse(x-W*0.56,y+H*0.16,W*0.30,H*0.26,0.2,0,7);g.fill();
-  g.beginPath();g.ellipse(x+W*0.56,y+H*0.16,W*0.30,H*0.26,-0.2,0,7);g.fill();
+  // gaunt hollow under the cheekbone — a cool shadow, not a blush
+  g.fillStyle="rgba(40,30,32,.16)";
+  g.beginPath();g.ellipse(x-W*0.58,y+H*0.34,W*0.18,H*0.22,0.35,0,7);g.fill();
+  g.beginPath();g.ellipse(x+W*0.58,y+H*0.34,W*0.18,H*0.22,-0.35,0,7);g.fill();
   g.strokeStyle=INK;g.lineWidth=1.1;
   g.beginPath();
   g.moveTo(x,y-H);
@@ -4986,61 +4986,69 @@ function drawFaceOn(g,x,y,r,skin,hair,mood,opt){
   g.bezierCurveTo(x-W*1.0,  y+H*0.30, x-W*1.05, y-H*0.78, x, y-H);
   g.closePath();g.stroke();
 
-  // hair: flat and greasy on top, straggling down the sides
+  // hair: a flat, greasy cap with a few soft strands past the jaw — skipped
+  // entirely under a head wrap, which should fully cover it
   const hd=shade(hair,-0.30);
-  // straggles first, so the mass sits over their roots
-  for(let i=0;i<14;i++){
-    const a=Math.PI*(0.80+(i/13)*1.40) + jt(i)*0.12;
-    const rr=H*(0.20+Math.abs(jt(i+20))*0.44);
-    const bx=x+Math.cos(a)*W*0.94, by=y+Math.sin(a)*H*0.86;
-    g.save();g.translate(bx,by);g.rotate(a+Math.PI/2+jt(i+40)*0.7);
-    g.fillStyle= i%3? hair : hd;
+  const wrapped=!!(opt&&opt.wrap);
+  if(!wrapped){
+    g.fillStyle=hair;
     g.beginPath();
-    g.moveTo(-2.0,0);
-    g.quadraticCurveTo(jt(i+60)*2.2, -rr*0.5, jt(i+70)*2.0, -rr);
-    g.quadraticCurveTo(1.8, -rr*0.4, 2.0, 0);
+    g.moveTo(x-W*1.00, y-H*0.02);
+    g.bezierCurveTo(x-W*1.08, y-H*1.00, x+W*1.08, y-H*1.00, x+W*1.00, y-H*0.02);
+    g.bezierCurveTo(x+W*0.62, y-H*0.34, x+W*0.20, y-H*0.20,  x-W*0.10, y-H*0.38);
+    g.bezierCurveTo(x-W*0.44, y-H*0.24, x-W*0.72, y-H*0.32, x-W*1.00, y-H*0.02);
     g.closePath();g.fill();
-    g.restore();
+    // clumped into a few soft partings
+    g.strokeStyle="rgba(0,0,0,.28)";g.lineWidth=0.9;
+    for(let i=0;i<4;i++){
+      g.beginPath();
+      g.moveTo(x-W*0.62+i*W*0.42, y-H*0.94);
+      g.quadraticCurveTo(x-W*0.50+i*W*0.44+jt(i+90)*4, y-H*0.54, x-W*0.66+i*W*0.46, y-H*0.22);
+      g.stroke();
+    }
+    g.fillStyle="rgba(255,250,240,.10)";
+    g.beginPath();g.ellipse(x-W*0.36,y-H*0.70,W*0.40,H*0.14,-0.35,0,7);g.fill();
+    // a handful of short strands hanging past the jaw — not a radiating crown
+    for(let i=0;i<6;i++){
+      const side=i<3?-1:1;
+      const t2=(i%3)/2;
+      const bx=x+side*W*(0.72+t2*0.22), by=y+H*(0.30+t2*0.42);
+      const len=H*(0.14+Math.abs(jt(i+20))*0.12);
+      const lean=side*(0.18+jt(i+40)*0.1);
+      g.save();g.translate(bx,by);g.rotate(lean);
+      g.fillStyle= i%2? hair : hd;
+      g.beginPath();
+      g.moveTo(-1.6,0);
+      g.quadraticCurveTo(jt(i+60)*1.6, len*0.6, jt(i+70)*1.2, len);
+      g.quadraticCurveTo(1.4, len*0.55, 1.6, 0);
+      g.closePath();g.fill();
+      g.restore();
+    }
   }
-  // the mass itself, sitting low on the brow
-  g.fillStyle=hair;
-  g.beginPath();
-  g.moveTo(x-W*1.00, y+H*0.06);
-  g.bezierCurveTo(x-W*1.08, y-H*1.00, x+W*1.08, y-H*1.00, x+W*1.00, y+H*0.06);
-  g.bezierCurveTo(x+W*0.62, y-H*0.30, x+W*0.20, y-H*0.16,  x-W*0.10, y-H*0.34);
-  g.bezierCurveTo(x-W*0.44, y-H*0.20, x-W*0.72, y-H*0.28, x-W*1.00, y+H*0.06);
-  g.closePath();g.fill();
-  // clumped into partings, and flattened on one side
-  g.strokeStyle="rgba(0,0,0,.28)";g.lineWidth=0.9;
-  for(let i=0;i<4;i++){
-    g.beginPath();
-    g.moveTo(x-W*0.62+i*W*0.42, y-H*0.92);
-    g.quadraticCurveTo(x-W*0.50+i*W*0.44+jt(i+90)*4, y-H*0.50, x-W*0.66+i*W*0.46, y-H*0.16);
-    g.stroke();
-  }
-  g.fillStyle="rgba(255,250,240,.10)";
-  g.beginPath();g.ellipse(x-W*0.36,y-H*0.66,W*0.40,H*0.15,-0.35,0,7);g.fill();
 
-  // eyes, sunk in
-  const ey=y-H*0.02, ex=W*0.40;
-  g.fillStyle="rgba(90,60,50,.16)";
-  g.beginPath();g.ellipse(x-ex,ey+1.2,2.3,1.9,0,0,7);g.fill();
-  g.beginPath();g.ellipse(x+ex,ey+1.2,2.3,1.9,0,0,7);g.fill();
+  // eyes, sunk in but with a tiny highlight so they read as alive
+  const ey=y-H*0.06, ex=W*0.38;
+  g.fillStyle="rgba(70,48,42,.14)";
+  g.beginPath();g.ellipse(x-ex,ey+1.6,2.6,2.1,0,0,7);g.fill();
+  g.beginPath();g.ellipse(x+ex,ey+1.6,2.6,2.1,0,0,7);g.fill();
   g.lineCap="round";
   if(mood==="out"){
     g.strokeStyle="rgba(40,30,24,.75)";g.lineWidth=1;
-    g.beginPath();g.moveTo(x-ex-1.2,ey);g.lineTo(x-ex+1.2,ey);g.stroke();
-    g.beginPath();g.moveTo(x+ex-1.2,ey);g.lineTo(x+ex+1.2,ey);g.stroke();
+    g.beginPath();g.moveTo(x-ex-1.3,ey);g.lineTo(x-ex+1.3,ey);g.stroke();
+    g.beginPath();g.moveTo(x+ex-1.3,ey);g.lineTo(x+ex+1.3,ey);g.stroke();
   } else {
-    g.fillStyle="rgba(34,26,20,.85)";
-    g.beginPath();g.arc(x-ex,ey,0.82,0,7);g.fill();
-    g.beginPath();g.arc(x+ex,ey,0.82,0,7);g.fill();
+    g.fillStyle="rgba(34,26,20,.88)";
+    g.beginPath();g.arc(x-ex,ey,1.05,0,7);g.fill();
+    g.beginPath();g.arc(x+ex,ey,1.05,0,7);g.fill();
+    g.fillStyle="rgba(255,255,255,.55)";
+    g.beginPath();g.arc(x-ex+0.35,ey-0.35,0.3,0,7);g.fill();
+    g.beginPath();g.arc(x+ex+0.35,ey-0.35,0.3,0,7);g.fill();
   }
   // mouth
   g.strokeStyle="rgba(110,66,58,.6)";g.lineWidth=0.9;
   g.beginPath();
-  if(mood==="ready") g.arc(x,y+H*0.30,W*0.30,0.22*Math.PI,0.78*Math.PI);
-  else { g.moveTo(x-W*0.22,y+H*0.52); g.lineTo(x+W*0.22,y+H*0.52); }
+  if(mood==="ready") g.arc(x,y+H*0.34,W*0.28,0.22*Math.PI,0.78*Math.PI);
+  else { g.moveTo(x-W*0.20,y+H*0.54); g.lineTo(x+W*0.20,y+H*0.54); }
   g.stroke();
 
   if(!opt) return;
