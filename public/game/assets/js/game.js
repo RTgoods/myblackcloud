@@ -755,7 +755,7 @@ function moveStick(cx,cy){
 }
 function dropStick(){stickId=null;mv={x:0,y:0,m:0};stickEl.classList.remove("on");
   knobEl.style.transform="translate(-50%,-50%)";}
-document.getElementById("stage").addEventListener("pointerdown",function(){ SFX.start(); });
+document.getElementById("stage").addEventListener("pointerdown",function(){ SFX.start(); unlockMusic(); });
 stickZone.addEventListener("pointerdown",function(e){
   if(stickId!==null)return; e.preventDefault(); stickId=e.pointerId;
   stickZone.setPointerCapture(e.pointerId);
@@ -2828,6 +2828,12 @@ const SFX=(function(){
 // in "storm" if the per-level black-cloud event's own end path is never hit.
 const music=(typeof ICUShiftMusic==="function")?ICUShiftMusic({volume:0.55}):null;
 if(music){ music.setRandom(false); music.setRandomClouds(true); }
+// music.start() only resumes its AudioContext once (it no-ops if already
+// "running"), and that first call often happens from begin() on auto-launch
+// (/play?level=N), which fires from a promise callback with no user gesture —
+// iOS Safari refuses to unlock an AudioContext there, and nothing ever retries.
+// Force a resume on every real gameplay tap so it recovers the same way SFX does.
+function unlockMusic(){ if(music&&music.ctx&&music.ctx.state!=="running"){ try{ music.ctx.resume(); }catch(e){} } }
 
 /* ================= RENDER — TOP-DOWN ================= */
 const cv=document.getElementById("cv"),g=cv.getContext("2d");
