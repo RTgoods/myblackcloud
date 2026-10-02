@@ -59,6 +59,30 @@ const CANS=[
   {k:"CAN75", pct:75,  rush:15, c:"#F2A03D", n:"Amber Can"},
   {k:"CAN100",pct:100, rush:20, c:"#C96BD8", n:"Violet Can"}
 ];
+const TOOL_IMAGE_PATHS={
+  SUCT:"suction-cath",YANK:"yankauer",INLINE:"inline-suction",ABG:"abg-syringe",
+  VENTK:"venturi-kit",NC:"nasal-cannula",NRB:"non-rebreather",FLOW:"flowmeter",
+  XTREE:"christmas-tree",MDI:"mdi-spacer",NEB:"neb-kit",BVM:"bvm",PEEP:"peep-valve",
+  ETCO2:"etco2-detector",TLUNG:"test-lung",MANO:"cuff-manometer",
+  IVK:"iv-start-kit",ABX:"antibiotic",FLUID:"fluid-bag",PRESS:"pressor",
+  FOLEY:"foley-kit",NGT:"ng-tube",BCULT:"blood-cultures",GLUC:"glucometer",
+  INSUL:"insulin",LEADS:"ecg-leads",DRESS:"dressing-kit",PAIN:"analgesia",
+  TURN:"slide-sheet",CHART:"chart",BLOOD:"blood-unit",SUPP:"suppository",
+  CAN25:"blue-can",CAN50:"green-can",CAN75:"amber-can",CAN100:"violet-can"
+};
+const TOOL_ART=Object.create(null);
+function toolArt(key){
+  const file=TOOL_IMAGE_PATHS[key];
+  if(!file) return null;
+  if(!TOOL_ART[key]){
+    const image=new Image();
+    image.onload=function(){if(typeof draw==="function") draw();};
+    const folder=key.indexOf("CAN")===0?"Shared-Power-Ups/":RN_TOOLS[key]?"RN-Pack/":"RT-Pack/";
+    image.src="/images/My-Black-Cloud-Tool-Icons/"+folder+file+".webp";
+    TOOL_ART[key]=image;
+  }
+  return TOOL_ART[key];
+}
 const CAN_KEYS=CANS.map(function(c){return c.k;});
 const CAN_BY={}; CANS.forEach(function(c){ CAN_BY[c.k]=c; });
 CANS.forEach(function(c){ TOOLS[c.k]={n:c.n,s:1}; SHORT[c.k]=c.n.split(" ")[0]; });
@@ -301,6 +325,11 @@ const POWERS={
   CAN50: {n:"Green Can",  c:"#8FE04A", d:"11s rush, +50 energy"},
   CAN75: {n:"Amber Can",  c:"#F2A03D", d:"15s rush, +75 energy"},
   CAN100:{n:"Violet Can", c:"#C96BD8", d:"20s rush, full tank"}
+};
+const POWER_IMAGE_PATHS={
+  SPRINT:"second-wind",TANK:"full-tank",CALM:"charge-nurse",KIT:"loaded-kit",
+  FRIEND:"a-friend",NARCAN:"narcan-kit",DEATH:"second-chance",PACK:"bigger-pack",
+  TANKUP:"deep-reserves",CAN25:"blue-can",CAN50:"green-can",CAN75:"amber-can",CAN100:"violet-can"
 };
 const SHOP=[
   {k:"CAN25", cost:8},
@@ -1257,7 +1286,7 @@ function openShop(){
   for(let i=0;i<POW_MAX;i++){
     const k=powers[i];
     carrying += k
-      ? '<span class="slot" style="border-color:'+POWERS[k].c+'"><img src="'+powerIcon(k)+'" alt=""></span>'
+        ? '<span class="slot" style="border-color:'+POWERS[k].c+'"><img loading="lazy" decoding="async" src="'+powerIcon(k)+'" alt=""></span>'
       : '<span class="slot"></span>';
   }
   let h='<div id="shopHead"><span class="bal">'+coins+' \u25c9</span>'+
@@ -1272,7 +1301,7 @@ function openShop(){
     const have=owned(it.k);
     const afford = !have && coins>=it.cost && (it.perm || powers.length<POW_MAX);
     h+='<div class="item" style="border-color:'+(afford?d.c+"55":"#1B2E36")+'">'+
-       '<img src="'+powerIcon(it.k)+'" alt="">'+
+        '<img loading="lazy" decoding="async" src="'+powerIcon(it.k)+'" alt="">'+
        '<div class="nm"><b style="color:'+d.c+'">'+d.n+'</b><span>'+d.d+'</span></div>'+
        '<button data-buy="'+i+'"'+(afford?"":" disabled")+'>'+
        (have? "OWNED" : it.cost+' \u25c9')+'</button></div>';
@@ -4173,6 +4202,8 @@ function nursingIcon(c,k){
   c.restore();
 }
 function toolIcon(c,k){
+  const image=toolArt(k);
+  if(image&&image.complete&&image.naturalWidth){c.drawImage(image,-10,-10,20,20);return;}
   if(RN_TOOLS[k]){nursingIcon(c,k);return;}
   c.lineWidth=1.7; c.lineCap="round"; c.lineJoin="round";
   switch(k){
@@ -4325,7 +4356,10 @@ function canIcon(c,key){
   c.beginPath();c.roundRect(-5.5,-10,11,20,2.5);c.stroke();
 }
 const PW_ICONS={};
-function powerIcon(k){ return PW_ICONS[k]; }
+function powerIcon(k){
+  const file=POWER_IMAGE_PATHS[k];
+  return file?"/images/My-Black-Cloud-Tool-Icons/Shared-Power-Ups/"+file+".webp":PW_ICONS[k];
+}
 (function(){
   const draw={
     SPRINT:function(c){                       // lightning bolt over a boot
@@ -4445,7 +4479,12 @@ const ICONS={};
   Object.keys(TOOLS).forEach(function(k){
     const c=document.createElement("canvas");c.width=c.height=96;
     const cc=c.getContext("2d");cc.translate(48,48);cc.scale(3.7,3.7);
-    toolIcon(cc,k); ICONS[k]=c.toDataURL();
+    if(TOOL_IMAGE_PATHS[k]){
+      ICONS[k]="/images/My-Black-Cloud-Tool-Icons/"+
+        (k.indexOf("CAN")===0?"Shared-Power-Ups/":RN_TOOLS[k]?"RN-Pack/":"RT-Pack/")+TOOL_IMAGE_PATHS[k]+".webp";
+    }else{
+      toolIcon(cc,k); ICONS[k]=c.toDataURL();
+    }
   });
 })();
 
@@ -6836,7 +6875,7 @@ function hud(){
         const d=POWERS[k];
         el2.className="pw full";
         el2.style.color=d.c; el2.style.borderColor=d.c;
-        el2.innerHTML='<img src="'+powerIcon(k)+'" alt="'+d.n+'"><b>'+d.n+'</b>';
+        el2.innerHTML='<img loading="lazy" decoding="async" src="'+powerIcon(k)+'" alt="'+d.n+'"><b>'+d.n+'</b>';
         el2.title=d.n+" — "+d.d;
         // fire on touch-down so it works as a second finger while you're moving
         (function(idx){
@@ -6988,7 +7027,7 @@ function hud(){
       '<div class="stage">Step '+(b.stage+1)+' of '+b.careMax+' — '+b.p.sn+'</div>'+
       '<div class="needs">'+b.p.need.map(function(k){
         const s=b.got.indexOf(k)>=0?"done":pack.indexOf(k)>=0?"carry":"";
-        return '<span class="need '+s+'"><img src="'+ICONS[k]+'" alt="">'+TOOLS[k].n+'</span>';}).join("")+'</div>'+
+        return '<span class="need '+s+'"><img loading="lazy" decoding="async" src="'+ICONS[k]+'" alt="">'+TOOLS[k].n+'</span>';}).join("")+'</div>'+
       '<div class="note">'+b.p.note+'</div>';
   }
   const row=document.getElementById("packRow"),sl=document.getElementById("slots");
@@ -7000,7 +7039,7 @@ function hud(){
       const c=document.createElement("span");
       c.className="chip"+(TOOLS[k].s>1?" bulk":"");
       c.title=TOOLS[k].n;
-      c.innerHTML='<img src="'+ICONS[k]+'" alt="'+TOOLS[k].n+'"><b>'+SHORT[k]+'</b>';
+      c.innerHTML='<img loading="lazy" decoding="async" src="'+ICONS[k]+'" alt="'+TOOLS[k].n+'"><b>'+SHORT[k]+'</b>';
       row.insertBefore(c,sl);});
     const free=SLOTS-used();
     for(let i=0;i<free;i++){

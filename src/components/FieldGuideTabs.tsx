@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState } from 'react'
 
 interface PowerUpItem {
@@ -27,9 +28,58 @@ interface Props {
   nursingTools: PackToolItem[]
 }
 
-function PowerUpArtwork({ icon, color }: { icon: string; color: string }) {
+const PACK_TOOL_IMAGES: Record<string, string> = {
+  SUCT: 'suction-cath', YANK: 'yankauer', INLINE: 'inline-suction', ABG: 'abg-syringe',
+  VENTK: 'venturi-kit', NC: 'nasal-cannula', NRB: 'non-rebreather', FLOW: 'flowmeter',
+  XTREE: 'christmas-tree', MDI: 'mdi-spacer', NEB: 'neb-kit', BVM: 'bvm',
+  PEEP: 'peep-valve', ETCO2: 'etco2-detector', TLUNG: 'test-lung', MANO: 'cuff-manometer',
+  IVK: 'iv-start-kit', ABX: 'antibiotic', FLUID: 'fluid-bag', PRESS: 'pressor',
+  FOLEY: 'foley-kit', NGT: 'ng-tube', BCULT: 'blood-cultures', GLUC: 'glucometer',
+  INSUL: 'insulin', LEADS: 'ecg-leads', DRESS: 'dressing-kit', PAIN: 'analgesia',
+  TURN: 'slide-sheet', CHART: 'chart', BLOOD: 'blood-unit', SUPP: 'suppository',
+}
+
+const POWER_UP_IMAGES: Record<string, string> = {
+  'Blue Can': 'blue-can', 'Green Can': 'green-can', 'Amber Can': 'amber-can',
+  'Violet Can': 'violet-can', 'Full Tank': 'full-tank', 'Second Wind': 'second-wind',
+  'Loaded Kit': 'loaded-kit', 'Charge Nurse': 'charge-nurse', 'A Friend': 'a-friend',
+  'Second Chance': 'second-chance', 'Bigger Pack': 'bigger-pack', 'Deep Reserves': 'deep-reserves',
+  'Narcan Kit': 'narcan-kit',
+}
+
+const RESPIRATORY_TOOL_IDS = new Set(['SUCT', 'YANK', 'INLINE', 'ABG', 'VENTK', 'NC', 'NRB', 'FLOW', 'XTREE', 'MDI', 'NEB', 'BVM', 'PEEP', 'ETCO2', 'TLUNG', 'MANO'])
+
+function PowerUpArtwork({ icon, color, name }: { icon: string; color: string; name: string }) {
+  const image = POWER_UP_IMAGES[name]
+  if (image) {
+    return (
+      <Image
+        src={`/images/My-Black-Cloud-Tool-Icons/Shared-Power-Ups/${image}.webp`}
+        alt={name}
+        width={512}
+        height={512}
+        sizes="112px"
+        quality={75}
+        loading="lazy"
+        className="h-28 w-28 object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.65)]"
+      />
+    )
+  }
   return (
-    <svg aria-hidden="true" viewBox="0 0 64 64" className="h-20 w-20 drop-shadow-[0_4px_8px_rgba(0,0,0,0.55)]">
+    <svg aria-hidden="true" viewBox="0 0 64 64" className="h-28 w-28 drop-shadow-[0_6px_10px_rgba(0,0,0,0.65)]">
+      <defs>
+        <radialGradient id={`power-glow-${icon}`}>
+          <stop stopColor={color} stopOpacity=".34" />
+          <stop offset="1" stopColor={color} stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id={`power-metal-${icon}`} x1="0" y1="0" x2="1" y2="1">
+          <stop stopColor="#f4fbff" stopOpacity=".72" />
+          <stop offset=".42" stopColor="#9fb6c0" stopOpacity=".18" />
+          <stop offset="1" stopColor="#17252c" stopOpacity=".56" />
+        </linearGradient>
+      </defs>
+      <circle cx="32" cy="32" r="30" fill={`url(#power-glow-${icon})`} />
+      <ellipse cx="32" cy="56" rx="18" ry="3" fill="#000" opacity=".36" />
       {icon === 'can' && (
         <>
           <rect x="23" y="9" width="18" height="46" rx="5" fill="#26343d" stroke="#c3d2db" strokeWidth="2" />
@@ -91,9 +141,69 @@ function PowerUpArtwork({ icon, color }: { icon: string; color: string }) {
   )
 }
 
-function PackToolArtwork({ icon, color }: { icon: string; color: string }) {
+function PackToolArtwork({ icon, color, id, name }: { icon: string; color: string; id: string; name: string }) {
+  const image = PACK_TOOL_IMAGES[id]
+  if (image) {
+    const pack = RESPIRATORY_TOOL_IDS.has(id) ? 'RT-Pack' : 'RN-Pack'
+    return (
+      <Image
+        src={`/images/My-Black-Cloud-Tool-Icons/${pack}/${image}.webp`}
+        alt={name}
+        width={512}
+        height={512}
+        sizes="112px"
+        quality={75}
+        loading="lazy"
+        className="h-28 w-28 object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.65)]"
+      />
+    )
+  }
   return (
-    <svg aria-hidden="true" viewBox="0 0 96 96" className="h-24 w-24 drop-shadow-[0_4px_8px_rgba(0,0,0,0.55)]">
+    <svg aria-hidden="true" viewBox="0 0 96 96" className="h-28 w-28 drop-shadow-[0_6px_10px_rgba(0,0,0,0.65)]">
+      <defs>
+        <radialGradient id={`tool-glow-${icon}`}>
+          <stop stopColor={color} stopOpacity=".3" />
+          <stop offset="1" stopColor={color} stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id={`tool-metal-${icon}`} x1="0" y1="0" x2="1" y2="1">
+          <stop stopColor="#f4fbff" stopOpacity=".72" />
+          <stop offset=".42" stopColor="#9fb6c0" stopOpacity=".18" />
+          <stop offset="1" stopColor="#17252c" stopOpacity=".56" />
+        </linearGradient>
+      </defs>
+      <circle cx="48" cy="47" r="45" fill={`url(#tool-glow-${icon})`} />
+      <ellipse cx="48" cy="84" rx="24" ry="3" fill="#000" opacity=".36" />
+      {icon === 'yankauer' && (
+        <>
+          <path d="M25 74 48 51l14-16 7-15 8 4-7 17-15 17-21 21c-5 5-14 1-13-5 0-2 1-4 4-6z" fill={color} stroke="#e5f4f7" strokeWidth="3" strokeLinejoin="round" />
+          <path d="m61 35 11 6m-21 10 6 6M28 72l6 6" stroke="#20313a" strokeWidth="3" strokeLinecap="round" />
+          <ellipse cx="72" cy="23" rx="6" ry="4" transform="rotate(28 72 23)" fill="#eff7fa" stroke={color} strokeWidth="2" />
+        </>
+      )}
+      {icon === 'inline' && (
+        <>
+          <path d="M12 48h23m26 0h23" stroke={color} strokeWidth="8" strokeLinecap="round" />
+          <rect x="32" y="31" width="32" height="34" rx="7" fill="#b9dce5" fillOpacity=".44" stroke="#e2f3f7" strokeWidth="3" />
+          <path d="M39 34v28m18-28v28M12 40v16m72-16v16" stroke="#28404a" strokeWidth="3" />
+          <path d="M38 36h18" stroke="#fff" strokeWidth="3" opacity=".72" />
+        </>
+      )}
+      {icon === 'venturi' && (
+        <>
+          <path d="M18 36q30-19 60 0v22q-30 21-60 0z" fill={color} fillOpacity=".8" stroke="#e7f5f5" strokeWidth="3" />
+          <path d="M18 43 7 36m71 7 11-7M32 39v17m16-22v28m16-23v17" stroke="#20313a" strokeWidth="3" strokeLinecap="round" />
+          <path d="M42 70h12v12H42zM45 82h6v7h-6z" fill="#f2b33d" stroke="#e7f5f5" strokeWidth="2" />
+          <path d="M45 74h6" stroke="#20313a" strokeWidth="2" />
+        </>
+      )}
+      {icon === 'ngtube' && (
+        <>
+          <path d="M33 17v30c0 17 27 10 27 25 0 7-7 11-15 7-8-4-7-15 0-20" fill="none" stroke={color} strokeWidth="6" strokeLinecap="round" />
+          <path d="M27 14h13v10H27z" fill="#c6d7dd" stroke="#f0f7f8" strokeWidth="2" />
+          <path d="M32 17v29c0 8 8 10 16 11" fill="none" stroke="#edf9fa" strokeWidth="1.6" opacity=".8" />
+          <circle cx="45" cy="79" r="3" fill="#f2b33d" />
+        </>
+      )}
       {icon === 'airway' && (
         <>
           <path d="M22 56c8-17 22-22 38-20 12 2 16 10 16 19 0 10-7 17-18 17H39c-10 0-19-6-17-16z" fill={color} fillOpacity=".82" stroke="#d7e3ec" strokeWidth="3" />
@@ -271,6 +381,7 @@ function PackToolArtwork({ icon, color }: { icon: string; color: string }) {
           <path d="M38 57c2 8 8 12 16 11" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity=".7" />
         </>
       )}
+      <path d="M18 86h60" stroke={`url(#tool-metal-${icon})`} strokeWidth="1.5" opacity=".7" />
     </svg>
   )
 }
@@ -339,7 +450,11 @@ export function FieldGuideTabs({ powerUps, respiratoryTools, nursingTools }: Pro
             <article key={item.name} className="overflow-hidden rounded-[8px] border border-[#2a3c47] bg-[#0c151b]">
               <div className="relative flex h-40 items-center justify-center border-b border-[#2a3c47] bg-[linear-gradient(145deg,#142630,#0b1419)]">
                 <span className="absolute left-4 top-3 text-[10px] font-bold tracking-[2px] text-[#7893a1]">{indexLabel}</span>
-                {tab === 'tools' ? <PackToolArtwork icon={(item as PackToolItem).icon} color={item.color} /> : <PowerUpArtwork icon={(item as PowerUpItem).icon} color={item.color} />}
+                {tab === 'tools' ? (
+                  <PackToolArtwork icon={(item as PackToolItem).icon} color={item.color} id={(item as PackToolItem).id} name={item.name} />
+                ) : (
+                  <PowerUpArtwork icon={(item as PowerUpItem).icon} color={item.color} name={item.name} />
+                )}
                 <span className="absolute bottom-3 right-3 rounded-[4px] bg-[#06090c]/90 px-3 py-2 text-[10px] font-bold text-[#f2c94d]">
                   {tab === 'tools' ? `${(item as PackToolItem).size} ${((item as PackToolItem).size === 1) ? 'slot' : 'slots'}` : (item as PowerUpItem).price}
                 </span>
