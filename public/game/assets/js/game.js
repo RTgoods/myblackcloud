@@ -395,7 +395,7 @@ function startLevel(n){
   blackout=0; blackoutFrom=0; preFlick=0; postFlick=0; eventName=""; eventT=0;
   namePool=[];
   events=[]; evRoll=6+Math.random()*6; partyP=0; dance=0; streamers=[];
-  cloudUsed=false; swarm=0; shouts=[]; powers=[]; friend=null; od=null; odP=0;
+  cloudUsed=false; musicCloudActive=false; swarm=0; shouts=[]; powers=[]; friend=null; od=null; odP=0;
   ppe=false; ppeP=0; orPt=null; orP=0; recP=0; ppeWarn=0; ppeUsed=false;
   high=0; narcan=null; spark=null; sparkP=0;
   mcartFull=false;
@@ -1735,7 +1735,7 @@ function update(dt){
   evRoll-=dt;
   if(evRoll<=0 && inZone>0 && !cloudUsed){
     evRoll=5+Math.random()*7;
-    if(Math.random()<0.55){ cloudUsed=true; if(music) music.blackCloud(); startEvent(); }
+    if(Math.random()<0.55){ cloudUsed=true; musicCloudActive=true; if(music) music.blackCloud(); startEvent(); }
   }
   if(inZone===0 && events.length){
     events.forEach(function(e){ if(e.kind==="party") failEvent(e,"The cake went uneaten."); });
@@ -1790,6 +1790,7 @@ function update(dt){
       }
     }
   }
+  if(musicCloudActive && events.length===0){ musicCloudActive=false; if(music) music.clearCloud(); }
 
   // the OD being carried off the unit
   if(od && od.out>0){
@@ -2827,7 +2828,13 @@ const SFX=(function(){
 // than its own randomizer; random cloud-mode drift stays on so it can't get stuck
 // in "storm" if the per-level black-cloud event's own end path is never hit.
 const music=(typeof ICUShiftMusic==="function")?ICUShiftMusic({volume:0.55}):null;
-if(music){ music.setRandom(false); music.setRandomClouds(true); }
+if(music){ music.setRandom(false); music.setRandomClouds(false); }
+// Every entry ever pushed into events[] comes from the single per-level
+// black-cloud trigger (startEvent(), called only from cloudUsed=true below) —
+// nothing else uses that array — so events.length dropping back to 0 is a
+// precise, universal "the black-cloud event just resolved" signal, covering
+// all ~12 event flavors without hooking each one's own end function.
+let musicCloudActive=false;
 // music.start() only resumes its AudioContext once (it no-ops if already
 // "running"), and that first call often happens from begin() on auto-launch
 // (/play?level=N), which fires from a promise callback with no user gesture —
