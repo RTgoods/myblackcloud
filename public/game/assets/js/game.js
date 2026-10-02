@@ -1447,6 +1447,7 @@ function relapse(b){
   log("BED "+b.room.id+" RELAPSED. Nobody moved him and he went off again.",true);
 }
 function startCode(b){
+  if(music) music.codeBlue();
   b.state="code"; b.t=CODE_T; b.max=CODE_T; codeBed=b;
   sel=beds.indexOf(b); selLock=5;
   spawnCart();                       // one cart per code, always in the hallway
@@ -1603,6 +1604,7 @@ function dischargePatient(){
   if(discharged>=quota) win();
 }
 function codeResolved(b){
+  if(music) music.rosc();
   b.state="active"; b.t=b.max; carry="";
   codeBed=beds.find(function(x){return x.state==="code";})||null;
   chairs.push({tx:CHAIR_BAY[0].x,ty:CHAIR_BAY[0].y});
@@ -1733,7 +1735,7 @@ function update(dt){
   evRoll-=dt;
   if(evRoll<=0 && inZone>0 && !cloudUsed){
     evRoll=5+Math.random()*7;
-    if(Math.random()<0.55){ cloudUsed=true; startEvent(); }
+    if(Math.random()<0.55){ cloudUsed=true; if(music) music.blackCloud(); startEvent(); }
   }
   if(inZone===0 && events.length){
     events.forEach(function(e){ if(e.kind==="party") failEvent(e,"The cake went uneaten."); });
@@ -2819,6 +2821,13 @@ const SFX=(function(){
   };
   return api;
 })();
+
+// Background score — a separate Web Audio engine (assets/audio/icu-shift-music.js),
+// driven by real bed state (codeBlue/rosc on an actual code, fail on a loss) rather
+// than its own randomizer; random cloud-mode drift stays on so it can't get stuck
+// in "storm" if the per-level black-cloud event's own end path is never hit.
+const music=(typeof ICUShiftMusic==="function")?ICUShiftMusic({volume:0.55}):null;
+if(music){ music.setRandom(false); music.setRandomClouds(true); }
 
 /* ================= RENDER — TOP-DOWN ================= */
 const cv=document.getElementById("cv"),g=cv.getContext("2d");
@@ -7199,6 +7208,7 @@ async function begin(n){
   keys={};act=false;actHeld=false;dropStick();
   actBtn.classList.remove("on");
   SFX.start();
+  if(music) music.start();
   if(n===1){ savedCount=0; totalDischarged=0; }
   startLevel(n);resize();ov.classList.add("hide");
   pause(false);
@@ -7241,6 +7251,7 @@ function win(){
 function lose(b){
   SFX.flatline();
   const i=powers.indexOf("DEATH");
+  if(i<0 && music) music.fail();  // only a real fail if there's no Second Chance to revive with
   const alt = i>=0 ? {
     t:"\u2620 USE SECOND CHANCE",
     fn:function(){
@@ -7392,6 +7403,7 @@ document.getElementById("startBtn").onclick=function(){SFX.start();fullHouse=fal
     e.preventDefault(); e.stopPropagation();
     if(!SFX.isReady()) SFX.start();
     const onNow=SFX.toggle();
+    if(music) music.setVolume(onNow?0.55:0);
     mb.textContent = onNow ? "\u266a" : "\u2715";
     mb.className = onNow ? "" : "off";
   });
