@@ -283,12 +283,12 @@ export default async function Home() {
                 key={step.number}
                 className="overflow-hidden rounded-[10px] border border-[#272d31] bg-[#0f1417] shadow-[0_18px_40px_rgba(0,0,0,0.18)]"
               >
-                <div className="relative h-52 w-full overflow-hidden border-b border-[#272d31] bg-[#0b0f12]">
+                <div className="relative aspect-square w-full overflow-hidden border-b border-[#272d31] bg-[#0b0f12]">
                   <Image
                     src={step.image}
                     alt={step.title}
                     fill
-                    className="object-cover"
+                    className="object-contain"
                     sizes="(max-width: 1024px) 100vw, 33vw"
                   />
                 </div>
