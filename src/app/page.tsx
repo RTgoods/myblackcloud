@@ -340,13 +340,13 @@ export default async function Home() {
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                 <Link
                   href={user ? '/play' : '/auth/login?mode=signup'}
-                  className="inline-flex min-h-[52px] items-center justify-center rounded-[4px] px-7 text-[11px] font-black uppercase tracking-[3px] text-[#06090c] shadow-[0_12px_30px_rgba(53,224,127,0.28)] transition hover:-translate-y-0.5 hover:brightness-105"
+                  className="inline-flex min-h-[52px] w-full items-center justify-center rounded-[4px] px-7 text-[11px] font-black uppercase tracking-[3px] text-[#06090c] shadow-[0_12px_30px_rgba(53,224,127,0.28)] transition hover:-translate-y-0.5 hover:brightness-105 sm:w-60"
                   style={{ background: 'linear-gradient(180deg,#6FE0A8 0%,#2BA86B 100%)' }}
                 >
                   {user ? 'Open the Shift' : 'Sign Up'}
                 </Link>
 
-                <div className="inline-flex min-h-[52px] items-center justify-center">
+                <div className="inline-flex min-h-[52px] w-full items-center justify-center sm:w-60">
                   <BuyButton userId={user?.id} hasPurchased={access.allowed} />
                 </div>
               </div>
