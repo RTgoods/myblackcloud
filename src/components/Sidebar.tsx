@@ -217,7 +217,16 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
                                   <p className={`${styles.statsLabel} text-[9px] font-bold uppercase tracking-[1.5px]`}>Coins earned</p>
                                   <p className={`${styles.statsValue} mt-1 text-[11px] font-bold`}>{stats.coinsEarned ?? 'Not recorded'}</p>
                                 </div>
+                                <div>
+                                  <p className={`${styles.statsLabel} text-[9px] font-bold uppercase tracking-[1.5px]`}>Codes survived</p>
+                                  <p className={`${styles.statsValue} mt-1 text-[11px] font-bold`}>{stats.codesSurvived ?? 'Not recorded'}</p>
+                                </div>
                               </div>
+                              {stats.cleanShift && (
+                                <p className="mt-3 inline-block rounded-[3px] px-2 py-1 text-[9px] font-black uppercase tracking-[1.5px]" style={{ color: '#06090c', background: '#35E07F' }}>
+                                  Clean Shift
+                                </p>
+                              )}
                               <div className="mt-3">
                                 <p className={`${styles.statsLabel} text-[9px] font-bold uppercase tracking-[1.5px]`}>Favorite tools</p>
                                 {stats.favoriteTools?.length ? (

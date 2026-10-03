@@ -4,7 +4,9 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { gameAccess } from '@/lib/game-access'
 import { progressLimiter, checkLimit } from '@/lib/rate-limit'
 import {
+  isValidCleanShift,
   isValidCoinsEarned,
+  isValidCodesSurvived,
   isValidDurationSeconds,
   isValidFavoriteTools,
   isValidLevel,
@@ -48,6 +50,8 @@ export async function POST(req: NextRequest) {
     durationSeconds?: number
     coinsEarned?: number
     favoriteTools?: { name: string; uses: number }[]
+    codesSurvived?: number
+    cleanShift?: boolean
   }
   const { level, totalDischarged = 0, resetVersion = 0 } = body
 
@@ -60,6 +64,11 @@ export async function POST(req: NextRequest) {
     !isValidCoinsEarned(body.coinsEarned) ||
     !isValidFavoriteTools(body.favoriteTools)
   )) return NextResponse.json({ error: 'Invalid level stats' }, { status: 400 })
+  const hasCareMetrics = body.codesSurvived !== undefined || body.cleanShift !== undefined
+  if (hasCareMetrics && (
+    !isValidCodesSurvived(body.codesSurvived) ||
+    !isValidCleanShift(body.cleanShift)
+  )) return NextResponse.json({ error: 'Invalid level stats' }, { status: 400 })
   if (level > 1 && !access.allowed) return NextResponse.json({ error: 'Purchase required' }, { status: 403 })
 
   const stat: LevelStat = {
@@ -69,6 +78,10 @@ export async function POST(req: NextRequest) {
       durationSeconds: body.durationSeconds,
       coinsEarned: body.coinsEarned,
       favoriteTools: body.favoriteTools,
+    } : {}),
+    ...(hasCareMetrics ? {
+      codesSurvived: body.codesSurvived,
+      cleanShift: body.cleanShift,
     } : {}),
   }
   const { data, error } = await createAdminClient().rpc('save_level_progress', {

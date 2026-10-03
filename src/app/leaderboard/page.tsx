@@ -9,14 +9,14 @@ export default async function LeaderboardPage() {
   const supabase = await createClient()
   const { data } = await supabase
     .from('leaderboard_entries')
-    .select('display_name, score, level_reached, created_at')
+    .select('display_name, score, level_reached, total_codes_survived, clean_shifts, created_at')
     .order('score', { ascending: false })
     .order('created_at', { ascending: true })
     .limit(25)
 
   return (
     <div className="min-h-screen px-4 py-16" style={{ background: '#06090C' }}>
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         <Link href="/" className="inline-block mb-8 text-sm" style={{ color: '#38D6E0' }}>← Back to MyBlackCloud</Link>
         <p className="text-[11px] font-black tracking-[3px] uppercase mb-2" style={{ color: '#C9A227' }}>TOP OPERATORS</p>
         <h1 className="font-black uppercase mb-8" style={{ fontSize: 32, letterSpacing: 3, color: '#D7E3EC' }}>Leaderboard</h1>

@@ -25,3 +25,13 @@ export function isValidFavoriteTools(value: unknown): value is { name: string; u
     Number.isInteger(tool.uses) && tool.uses > 0 && tool.uses <= 100_000
   )
 }
+
+// A level can realistically only fit a handful of codes in its time limit —
+// 20 is a generous ceiling against a hand-crafted request, not a tuned limit.
+export function isValidCodesSurvived(value: unknown): value is number {
+  return Number.isInteger(value) && (value as number) >= 0 && (value as number) <= 20
+}
+
+export function isValidCleanShift(value: unknown): value is boolean {
+  return typeof value === 'boolean'
+}

@@ -295,7 +295,7 @@ let seated=[], reception=null, cleaners=[], pacers=[], gazers=[], birth=null, de
 let chat=null, chatT=5, chatSaid=[];
 let blackout=0, blackoutFrom=0, preFlick=0, postFlick=0, eventName="", eventT=0;
 let events=[], evRoll=0, coins=0, partyP=0, dance=0, streamers=[], banner="", bannerT=0, bannerKind="";
-let levelCoinsEarned=0, levelToolUses={};
+let levelCoinsEarned=0, levelToolUses={}, levelCodesSurvived=0, levelHadCode=false, levelHadRelapse=false;
 function awardCoins(amount){coins+=amount;levelCoinsEarned+=amount;}
 let cloudUsed=false, swarm=0, shouts=[];
 let powers=[], pwSig=null, friend=null, packSig=null, detailSig=null, od=null, odP=0;
@@ -351,7 +351,7 @@ const POWER_KEYS=Object.keys(POWERS).filter(function(k){
 /* ================= LEVEL ================= */
 function startLevel(n){
   level=n; syncLevelMenu(n); t=0; flavorT=8; dropP=0; dirtyP=0; cart=null; carts=[]; codeBed=null;
-  levelCoinsEarned=0; levelToolUses={};
+  levelCoinsEarned=0; levelToolUses={}; levelCodesSurvived=0; levelHadCode=false; levelHadRelapse=false;
   SLOTS=packUp?8:6; EMAX=tankUp?150:100;
   carry=""; carryBed=null; boost=0; discharged=0; energy=EMAX; warnedE=0; gearFlash=0;
   rush=0; trail=[]; trailCol="#8FE04A"; confetti=0;
@@ -1435,6 +1435,7 @@ function failEvent(e,msg){
 }
 function relapse(b){
   // back into care, one step behind, and it no longer counts as a save
+  levelHadRelapse=true;
   savedCount=Math.max(0,savedCount-1);
   b.stage=Math.max(0,b.stage-1);
   const st=b.plan[b.stage];
@@ -1447,6 +1448,7 @@ function relapse(b){
   log("BED "+b.room.id+" RELAPSED. Nobody moved him and he went off again.",true);
 }
 function startCode(b){
+  levelHadCode=true;
   if(music) music.codeBlue();
   b.state="code"; b.t=CODE_T; b.max=CODE_T; codeBed=b;
   sel=beds.indexOf(b); selLock=5;
@@ -1604,6 +1606,7 @@ function dischargePatient(){
   if(discharged>=quota) win();
 }
 function codeResolved(b){
+  levelCodesSurvived++;
   if(music) music.rosc();
   b.state="active"; b.t=b.max; carry="";
   codeBed=beds.find(function(x){return x.state==="code";})||null;
@@ -7216,16 +7219,19 @@ function saveProgress(completedLevel,fullClear){
   const favoriteTools=Object.keys(levelToolUses).sort(function(a,b){
     return levelToolUses[b]-levelToolUses[a];
   }).slice(0,3).map(function(key){return {name:TOOLS[key].n,uses:levelToolUses[key]};});
+  const cleanShift=!levelHadCode && !levelHadRelapse;
   fetch("/api/progress",{method:"POST",credentials:"same-origin",cache:"no-store",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({level:completedLevel,totalDischarged:totalDischarged,
-      durationSeconds:Math.round(t),coinsEarned:levelCoinsEarned,favoriteTools:favoriteTools})
+      durationSeconds:Math.round(t),coinsEarned:levelCoinsEarned,favoriteTools:favoriteTools,
+      codesSurvived:levelCodesSurvived,cleanShift:cleanShift})
   }).then(function(response){
     if(response.ok && window.parent!==window) window.parent.postMessage({type:"shift-progress-saved"},location.origin);
   }).catch(function(){});
   fetch("/api/leaderboard",{method:"POST",credentials:"same-origin",cache:"no-store",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({score:totalDischarged,levelReached:completedLevel})}).catch(function(){});
+    body:JSON.stringify({score:totalDischarged,levelReached:completedLevel,
+      codesSurvived:levelCodesSurvived,cleanShift:cleanShift})}).catch(function(){});
 }
 function win(){
   const nx=level+1;

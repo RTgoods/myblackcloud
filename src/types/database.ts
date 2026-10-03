@@ -24,6 +24,8 @@ export type LevelStat = {
   durationSeconds?: number
   coinsEarned?: number
   favoriteTools?: { name: string; uses: number }[]
+  codesSurvived?: number
+  cleanShift?: boolean
 }
 
 export type Progress = {
@@ -40,6 +42,8 @@ export type LeaderboardEntry = {
   display_name: string
   score: number
   level_reached: number
+  total_codes_survived: number
+  clean_shifts: number
   created_at: string
 }
 
@@ -111,12 +115,16 @@ export type Database = {
           display_name: string
           score: number
           level_reached: number
+          total_codes_survived?: number
+          clean_shifts?: number
           created_at?: string
         }
         Update: {
           display_name?: string
           score?: number
           level_reached?: number
+          total_codes_survived?: number
+          clean_shifts?: number
         }
         Relationships: []
       }
