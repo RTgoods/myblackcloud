@@ -146,11 +146,6 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
               </div>
             </div>
 
-            <nav className={`${styles.nav} flex flex-col gap-3 mt-4 pt-4 text-[11px] uppercase tracking-[1px]`}>
-              <Link href="/play" onClick={closeOnMobile} className={styles.playLink}>Play SHIFT</Link>
-              <Link href="/leaderboard" onClick={closeOnMobile} className={styles.navLink}>Leaderboard</Link>
-            </nav>
-
             <div className={`${styles.directory} mt-4 pt-4`}>
               <div className={`${styles.directoryHeading} mb-2 flex items-center justify-between text-[10px] font-black uppercase tracking-[2px]`}>
                 <span>Shift Directory</span>
