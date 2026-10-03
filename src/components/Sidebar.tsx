@@ -118,6 +118,26 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
           </button>
         </div>
 
+        {!open && (
+          <div className="mt-4 flex flex-col items-center gap-2">
+            {Array.from({ length: 8 }, (_, i) => i + 1).map((n) => {
+              const playable = isLevelUnlocked(n)
+              const completed = savedCompletedLevels.includes(n)
+              return (
+                <Link
+                  key={n}
+                  href={`/play?level=${n}`}
+                  onClick={closeOnMobile}
+                  aria-label={`Launch level ${n}`}
+                  className={`${styles.levelMarker} ${completed ? styles.markerCompleted : playable ? styles.markerPlayable : styles.markerLocked} flex h-9 w-9 shrink-0 items-center justify-center rounded-[3px] border text-xs font-black`}
+                >
+                  {completed ? '✓' : `S${n}`}
+                </Link>
+              )
+            })}
+          </div>
+        )}
+
         {open && (
           <>
             <div className="mt-4 mb-2 flex flex-col gap-2 text-[11px]">
