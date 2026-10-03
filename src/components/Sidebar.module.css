@@ -159,6 +159,19 @@
   background: var(--site-panel);
 }
 
+.lockBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--background);
+  border: 1px solid var(--site-border);
+  font-size: 8px;
+  line-height: 1;
+}
+
 .markerCompleted {
   color: var(--site-teal);
   border-color: var(--site-teal);

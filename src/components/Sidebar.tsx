@@ -129,9 +129,10 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
                   href={`/play?level=${n}`}
                   onClick={closeOnMobile}
                   aria-label={`Launch level ${n}`}
-                  className={`${styles.levelMarker} ${completed ? styles.markerCompleted : playable ? styles.markerPlayable : styles.markerLocked} flex h-9 w-9 shrink-0 items-center justify-center rounded-[3px] border text-xs font-black`}
+                  className={`${styles.levelMarker} ${completed ? styles.markerCompleted : playable ? styles.markerPlayable : styles.markerLocked} relative flex h-9 w-9 shrink-0 items-center justify-center rounded-[3px] border text-xs font-black`}
                 >
                   {completed ? '✓' : `S${n}`}
+                  {!playable && <span className={`${styles.lockBadge} absolute -right-1 -top-1`} aria-hidden="true">🔒</span>}
                 </Link>
               )
             })}
@@ -188,9 +189,10 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
                         className={`${styles.levelButton} ${completed ? styles.levelCompleted : playable ? styles.levelPlayable : styles.levelLocked} flex min-h-[66px] w-full items-center gap-3 py-2 text-left`}
                       >
                         <span
-                          className={`${styles.levelMarker} ${completed ? styles.markerCompleted : playable ? styles.markerPlayable : styles.markerLocked} flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] border text-sm font-black`}
+                          className={`${styles.levelMarker} ${completed ? styles.markerCompleted : playable ? styles.markerPlayable : styles.markerLocked} relative flex h-10 w-10 shrink-0 items-center justify-center rounded-[3px] border text-sm font-black`}
                         >
                           {completed ? '✓' : `S${n}`}
+                          {!playable && <span className={`${styles.lockBadge} absolute -right-1 -top-1`} aria-hidden="true">🔒</span>}
                         </span>
                         <span className="flex min-w-0 flex-1 flex-col gap-1">
                           <span className={`${styles.levelName} ${completed ? styles.completedText : playable ? styles.playableText : styles.lockedText} text-[11px] font-black uppercase tracking-[2px]`}>
