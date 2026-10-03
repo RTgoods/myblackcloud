@@ -106,6 +106,9 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
               <span className={`${styles.brand} block font-black uppercase leading-tight`}>
                 My Black Cloud
               </span>
+              <span className={`${styles.tagline} block font-bold uppercase`}>
+                Shift Happens
+              </span>
             </Link>
           )}
           <button
