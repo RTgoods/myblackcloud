@@ -2095,12 +2095,13 @@ function update(dt){
     if(chat){ chat.life-=dt; if(chat.life<=0) chat=null; }
     if(chatT<=0 && !chat && !rant){
       chatT=5+Math.random()*7;
-      // everyone who could plausibly be overheard
+      // staff only — nurses, aides and housekeeping, never the wandering
+      // family/visitors (pacers, seated, gazers are excluded entirely;
+      // the "Family" role that can spawn into staff[] is filtered out)
       const pool=[];
-      staff.forEach(function(o){ if(!o.z) pool.push(o); });
+      staff.forEach(function(o){ if(!o.z && o.kind!=="Family") pool.push(o); });
       cleaners.forEach(function(o){ pool.push(o); });
       desked.forEach(function(o){ pool.push(o); });
-      pacers.forEach(function(o){ pool.push(o); });
       if(reception) pool.push(reception);
       const near=pool.filter(function(o){
         return Math.hypot(o.x-player.x,o.y-player.y) < TILE*7; });
