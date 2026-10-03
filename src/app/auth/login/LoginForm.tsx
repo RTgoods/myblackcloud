@@ -12,6 +12,7 @@ export function LoginForm() {
   const [mode, setMode] = useState<Mode>(searchParams.get('mode') === 'signup' ? 'signup' : 'login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [ageConfirmed, setAgeConfirmed] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -68,8 +69,6 @@ export function LoginForm() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-16" style={{ background: '#06090C' }}>
       <div className="w-full max-w-sm">
-        <Link href="/" className="inline-block mb-6 py-2 text-sm font-bold" style={{ color: '#38D6E0' }}>← Back to MyBlackCloud</Link>
-
         <div className="text-center mb-8">
           <p className="text-[11px] font-black tracking-[3px] uppercase mb-3" style={{ color: '#C9A227' }}>
             {mode === 'login' ? 'SIGN IN' : mode === 'recovery' ? 'RESET PASSWORD' : 'CREATE ACCOUNT'}
@@ -93,11 +92,23 @@ export function LoginForm() {
             {mode !== 'recovery' && (
               <div>
                 <label htmlFor="password" className="block text-[12px] tracking-[1px] uppercase font-black mb-2" style={{ color: '#C9A227' }}>Password</label>
-                <input
-                  id="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} type="password"
-                  value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
-                  placeholder="Min. 6 characters" style={inputStyle}
-                />
+                <div className="relative">
+                  <input
+                    id="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} type={showPassword ? 'text' : 'password'}
+                    value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
+                    placeholder="Min. 6 characters" style={{ ...inputStyle, paddingRight: 56 }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(s => !s)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-pressed={showPassword}
+                    className="absolute right-0 top-0 h-full px-3 text-[11px] font-black uppercase tracking-[0.5px]"
+                    style={{ color: '#38D6E0' }}
+                  >
+                    {showPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
               </div>
             )}
 
