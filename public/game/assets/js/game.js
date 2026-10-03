@@ -5042,33 +5042,35 @@ function drawFaceOn(g,x,y,r,skin,hair,mood,opt){
     }
   }
 
-  // eyebrows — short, a little worn/thin, sit close over the eyes
-  const ey=y-H*0.06, ex=W*0.38;
-  g.strokeStyle=rgba(hd,.70);g.lineWidth=Math.max(0.8,r*0.045);g.lineCap="round";
-  g.beginPath();g.moveTo(x-ex-1.5,ey-2.6);g.quadraticCurveTo(x-ex,ey-3.3,x-ex+1.5,ey-2.5);g.stroke();
-  g.beginPath();g.moveTo(x+ex-1.5,ey-2.5);g.quadraticCurveTo(x+ex,ey-3.3,x+ex+1.5,ey-2.6);g.stroke();
+  // eyebrows — flatter, set further above the eyes so they read as tired,
+  // not raised/surprised
+  const ey=y-H*0.06, ex=W*0.36;
+  g.strokeStyle=rgba(hd,.60);g.lineWidth=Math.max(0.7,r*0.04);g.lineCap="round";
+  g.beginPath();g.moveTo(x-ex-1.4,ey-3.6);g.quadraticCurveTo(x-ex,ey-3.9,x-ex+1.4,ey-3.5);g.stroke();
+  g.beginPath();g.moveTo(x+ex-1.4,ey-3.5);g.quadraticCurveTo(x+ex,ey-3.9,x+ex+1.4,ey-3.6);g.stroke();
 
-  // eyes, sunk in but with a tiny highlight so they read as alive
+  // eyes — smaller and a little narrower so they read as tired/sunken,
+  // not wide and alert
   g.fillStyle="rgba(70,48,42,.14)";
-  g.beginPath();g.ellipse(x-ex,ey+1.6,2.6,2.1,0,0,7);g.fill();
-  g.beginPath();g.ellipse(x+ex,ey+1.6,2.6,2.1,0,0,7);g.fill();
+  g.beginPath();g.ellipse(x-ex,ey+1.3,2.2,1.6,0,0,7);g.fill();
+  g.beginPath();g.ellipse(x+ex,ey+1.3,2.2,1.6,0,0,7);g.fill();
   g.lineCap="round";
   if(mood==="out"){
     g.strokeStyle="rgba(40,30,24,.75)";g.lineWidth=1;
-    g.beginPath();g.moveTo(x-ex-1.3,ey);g.lineTo(x-ex+1.3,ey);g.stroke();
-    g.beginPath();g.moveTo(x+ex-1.3,ey);g.lineTo(x+ex+1.3,ey);g.stroke();
+    g.beginPath();g.moveTo(x-ex-1.1,ey);g.lineTo(x-ex+1.1,ey);g.stroke();
+    g.beginPath();g.moveTo(x+ex-1.1,ey);g.lineTo(x+ex+1.1,ey);g.stroke();
   } else {
     g.fillStyle="rgba(34,26,20,.88)";
-    g.beginPath();g.arc(x-ex,ey,1.05,0,7);g.fill();
-    g.beginPath();g.arc(x+ex,ey,1.05,0,7);g.fill();
-    g.fillStyle="rgba(255,255,255,.55)";
-    g.beginPath();g.arc(x-ex+0.35,ey-0.35,0.3,0,7);g.fill();
-    g.beginPath();g.arc(x+ex+0.35,ey-0.35,0.3,0,7);g.fill();
+    g.beginPath();g.ellipse(x-ex,ey,0.85,0.70,0,0,7);g.fill();
+    g.beginPath();g.ellipse(x+ex,ey,0.85,0.70,0,0,7);g.fill();
+    g.fillStyle="rgba(255,255,255,.50)";
+    g.beginPath();g.arc(x-ex+0.3,ey-0.25,0.22,0,7);g.fill();
+    g.beginPath();g.arc(x+ex+0.3,ey-0.25,0.22,0,7);g.fill();
   }
 
   // nose — a simple soft bridge shadow plus a hint of a nostril shadow,
   // enough to break up the empty space without reading as a cartoon beak
-  const nx=x, ny1=ey+1.2, ny2=y+H*0.20;
+  const nx=x, ny1=ey+1.0, ny2=y+H*0.20;
   g.strokeStyle=rgba(skinDk,.45);g.lineWidth=Math.max(0.7,r*0.045);
   g.beginPath();g.moveTo(nx+0.4,ny1);g.quadraticCurveTo(nx+1.3,(ny1+ny2)/2,nx+0.6,ny2);g.stroke();
   g.fillStyle=rgba(skinDk,.30);
