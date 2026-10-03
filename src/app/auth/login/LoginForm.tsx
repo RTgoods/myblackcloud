@@ -12,6 +12,7 @@ export function LoginForm() {
   const [mode, setMode] = useState<Mode>(searchParams.get('mode') === 'signup' ? 'signup' : 'login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [ageConfirmed, setAgeConfirmed] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
@@ -34,6 +35,7 @@ export function LoginForm() {
         if (error) setError(error.message)
         else setMessage('If an account exists for this email, a password reset link will arrive shortly.')
       } else if (mode === 'signup') {
+        if (!ageConfirmed) { setError('Please confirm you are 18 or older to continue.'); setLoading(false); return }
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -114,6 +116,18 @@ export function LoginForm() {
               <div className="p-3 rounded-sm text-[11px] tracking-[0.5px]" style={{ background: 'rgba(53,224,127,0.1)', border: '1px solid rgba(53,224,127,0.3)', color: '#35E07F' }}>
                 {message}
               </div>
+            )}
+
+            {mode === 'signup' && (
+              <label className="flex items-start gap-2 text-[11px] leading-relaxed tracking-[0.5px] cursor-pointer" style={{ color: '#AAB3B7' }}>
+                <input
+                  type="checkbox" required checked={ageConfirmed}
+                  onChange={e => setAgeConfirmed(e.target.checked)}
+                  className="mt-0.5 shrink-0"
+                  style={{ width: 15, height: 15, accentColor: '#38D6E0' }}
+                />
+                I confirm I am 18 years of age or older.
+              </label>
             )}
 
             <button
