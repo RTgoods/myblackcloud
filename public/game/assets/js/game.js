@@ -83,12 +83,6 @@ function toolArt(key){
   }
   return TOOL_ART[key];
 }
-// Trying a real top-down photo for bed 1's whole overhead bed+patient —
-// same lazy-load-then-redraw pattern as toolArt().
-const BED1_IMAGE=new Image();
-let bed1ImageReady=false;
-BED1_IMAGE.onload=function(){bed1ImageReady=true; if(typeof draw==="function") draw();};
-BED1_IMAGE.src="/images/patient-bed1.webp";
 const CAN_KEYS=CANS.map(function(c){return c.k;});
 const CAN_BY={}; CANS.forEach(function(c){ CAN_BY[c.k]=c; });
 CANS.forEach(function(c){ TOOLS[c.k]={n:c.n,s:1}; SHORT[c.k]=c.n.split(" ")[0]; });
@@ -4800,7 +4794,6 @@ function drawEquip(x,y,type,a){
 /* drawn last, so nobody can walk over the words */
 /* a thumbnail of the patient for the card, drawn once and cached */
 function faceThumb(b){
-  if(b.room.id===1) return "/images/patient-bed1-face.webp";  // trying a real portrait for bed 1
   const key=(b.name||"")+"|"+b.skin+"|"+b.hair+"|"+(b.look?JSON.stringify(b.look):"")+"|"+
             (b.state==="code"?"out":b.state==="ready"?"ready":(b.t/b.max)<0.24?"out":"worn");
   if(b._thumbKey===key) return b._thumb;
@@ -5150,18 +5143,6 @@ function drawBed(b){
   }
 
   objectShadow(px+W/2+2,py+H/2+4,W*.8,H*.64);
-
-  if(b.room.id===1 && occ && bed1ImageReady){
-    // Trying a real top-down photo for the whole bed instead of the
-    // procedurally drawn frame/mattress/face — the status-color outline
-    // (green/yellow/red/teal, same as every other bed) still draws on top
-    // so the at-a-glance vitals read stays intact.
-    g.save();
-    g.beginPath();g.roundRect(px,py,W,H-2,4);g.clip();
-    g.drawImage(BED1_IMAGE,px,py,W,H-2);
-    g.restore();
-    g.strokeStyle=c;g.lineWidth=.65;g.beginPath();g.roundRect(px,py,W,H-2,4);g.stroke();
-  } else {
   // frame
   g.fillStyle="rgba(0,0,0,.34)";g.beginPath();g.roundRect(px+1,py+2,W,H-2,4);g.fill();
   g.fillStyle=objectMaterial(g,"#59687A",px,py,W,H);g.beginPath();g.roundRect(px,py,W,H-2,4);g.fill();
@@ -5209,7 +5190,6 @@ function drawBed(b){
     g.beginPath();g.moveTo(rx+1,py+16);g.lineTo(rx+1,py+H-20);g.stroke();
   });
   g.strokeStyle=c;g.lineWidth=.65;g.beginPath();g.roundRect(px,py,W,H-2,4);g.stroke();
-  }
 
   // the current step laid out at the foot of the bed, greyed until delivered
   if(b.p&&b.p.need&&b.state!=="ready"){
