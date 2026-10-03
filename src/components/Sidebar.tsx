@@ -123,17 +123,21 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
             {Array.from({ length: 8 }, (_, i) => i + 1).map((n) => {
               const playable = isLevelUnlocked(n)
               const completed = savedCompletedLevels.includes(n)
-              return (
-                <Link
-                  key={n}
-                  href={`/play?level=${n}`}
-                  onClick={closeOnMobile}
-                  aria-label={`Launch level ${n}`}
-                  className={`${styles.levelMarker} ${completed ? styles.markerCompleted : playable ? styles.markerPlayable : styles.markerLocked} relative flex h-9 w-9 shrink-0 items-center justify-center rounded-[3px] border text-xs font-black`}
-                >
+              const markerClass = `${styles.levelMarker} ${completed ? styles.markerCompleted : playable ? styles.markerPlayable : styles.markerLocked} relative flex h-9 w-9 shrink-0 items-center justify-center rounded-[3px] border text-xs font-black`
+              const markerContent = (
+                <>
                   {completed ? '✓' : `S${n}`}
                   {!playable && <span className={`${styles.lockBadge} absolute -right-1 -top-1`} aria-hidden="true">🔒</span>}
+                </>
+              )
+              return playable ? (
+                <Link key={n} href={`/play?level=${n}`} onClick={closeOnMobile} aria-label={`Launch level ${n}`} className={markerClass}>
+                  {markerContent}
                 </Link>
+              ) : (
+                <div key={n} aria-label={`Level ${n} locked`} className={markerClass}>
+                  {markerContent}
+                </div>
               )
             })}
           </div>
