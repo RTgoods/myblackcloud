@@ -83,6 +83,12 @@ function toolArt(key){
   }
   return TOOL_ART[key];
 }
+// A real portrait for bed 1's overhead face — same lazy-load-then-redraw
+// pattern as toolArt().
+const BED1_FACE=new Image();
+let bed1FaceReady=false;
+BED1_FACE.onload=function(){bed1FaceReady=true; if(typeof draw==="function") draw();};
+BED1_FACE.src="/images/patient-bed1-face.webp";
 const CAN_KEYS=CANS.map(function(c){return c.k;});
 const CAN_BY={}; CANS.forEach(function(c){ CAN_BY[c.k]=c; });
 CANS.forEach(function(c){ TOOLS[c.k]={n:c.n,s:1}; SHORT[c.k]=c.n.split(" ")[0]; });
@@ -4794,6 +4800,7 @@ function drawEquip(x,y,type,a){
 /* drawn last, so nobody can walk over the words */
 /* a thumbnail of the patient for the card, drawn once and cached */
 function faceThumb(b){
+  if(b.room.id===1) return "/images/patient-bed1-face.webp";
   const key=(b.name||"")+"|"+b.skin+"|"+b.hair+"|"+(b.look?JSON.stringify(b.look):"")+"|"+
             (b.state==="code"?"out":b.state==="ready"?"ready":(b.t/b.max)<0.24?"out":"worn");
   if(b._thumbKey===key) return b._thumb;
@@ -5175,9 +5182,17 @@ function drawBed(b){
   g.fillStyle=objectMaterial(g,"#D7E1E8",px,py,W,H);g.beginPath();g.roundRect(px+6,py+12,W-12,9,3);g.fill();
 
   if(occ){
-    drawFace(px+W/2, py+18, 6.4, b.skin||"#D6A87E", b.hair||"#3A2A20",
-             b.state==="code" ? "out" : b.state==="ready" ? "ready" :
-             (b.t/b.max)<0.24 ? "out" : "worn", b.look);
+    if(b.room.id===1 && bed1FaceReady){
+      const fx=px+W/2, fy=py+18, fw=12, fh=15;
+      g.save();
+      g.beginPath(); g.ellipse(fx,fy,fw/2,fh/2,0,0,Math.PI*2); g.clip();
+      g.drawImage(BED1_FACE, fx-fw/2, fy-fh/2, fw, fh);
+      g.restore();
+    } else {
+      drawFace(px+W/2, py+18, 6.4, b.skin||"#D6A87E", b.hair||"#3A2A20",
+               b.state==="code" ? "out" : b.state==="ready" ? "ready" :
+               (b.t/b.max)<0.24 ? "out" : "worn", b.look);
+    }
     g.fillStyle="#9FC4D6";g.beginPath();g.roundRect(px+7,py+24,W-14,6,2);g.fill();
     g.fillStyle=objectMaterial(g,"#6E8798",px,py,W,H);g.beginPath();g.roundRect(px+5,py+29,W-10,H-46,3);g.fill();
     g.fillStyle="#7F98A9";g.fillRect(px+5,py+29,W-10,2.5);
