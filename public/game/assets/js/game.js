@@ -4972,53 +4972,59 @@ function drawCart(x,y,glow){
 /* a supine face seen from directly above; "up" on screen is the crown */
 function drawFace(x,y,r,skin,hair,mood,opt){ drawFaceOn(g,x,y,r,skin,hair,mood,opt); }
 function drawFaceOn(g,x,y,r,skin,hair,mood,opt){
-  // a longer, gaunter head than the staff — these people have been here a while
-  const H=r*1.1, W=r*0.84;
+  const H=r*1.08, W=r*0.86;
   const seed=(x*0.37+y*0.11);
   function jt(i){ const v=Math.sin(seed*13.1+i*57.7)*43758.5453; return (v-Math.floor(v))-0.5; }
 
+  // head — a touch rounder at the jaw than before, still lean
   g.fillStyle=skin;
   g.beginPath();
   g.moveTo(x, y-H);
-  g.bezierCurveTo(x+W*1.05, y-H*0.78, x+W*1.0,  y+H*0.30, x+W*0.52, y+H*0.80);
-  g.bezierCurveTo(x+W*0.24, y+H*1.02, x-W*0.24, y+H*1.02, x-W*0.52, y+H*0.80);
-  g.bezierCurveTo(x-W*1.0,  y+H*0.30, x-W*1.05, y-H*0.78, x, y-H);
+  g.bezierCurveTo(x+W*1.05, y-H*0.78, x+W*1.02, y+H*0.40, x+W*0.46, y+H*0.86);
+  g.bezierCurveTo(x+W*0.22, y+H*1.00, x-W*0.22, y+H*1.00, x-W*0.46, y+H*0.86);
+  g.bezierCurveTo(x-W*1.02, y+H*0.40, x-W*1.05, y-H*0.78, x, y-H);
   g.closePath();g.fill();
-  // gaunt hollow under the cheekbone — a cool shadow, not a blush
-  g.fillStyle="rgba(40,30,32,.16)";
-  g.beginPath();g.ellipse(x-W*0.58,y+H*0.34,W*0.18,H*0.22,0.35,0,7);g.fill();
-  g.beginPath();g.ellipse(x+W*0.58,y+H*0.34,W*0.18,H*0.22,-0.35,0,7);g.fill();
+
+  // soft under-cheek shadow — smaller, lower-opacity, feathered with two
+  // stacked passes instead of one hard-edged blob
+  const skinDk=shade(skin,-0.22);
+  g.fillStyle=rgba(skinDk,.10);
+  g.beginPath();g.ellipse(x-W*0.50,y+H*0.42,W*0.20,H*0.16,0.25,0,7);g.fill();
+  g.beginPath();g.ellipse(x+W*0.50,y+H*0.42,W*0.20,H*0.16,-0.25,0,7);g.fill();
+  g.fillStyle=rgba(skinDk,.16);
+  g.beginPath();g.ellipse(x-W*0.54,y+H*0.40,W*0.11,H*0.09,0.25,0,7);g.fill();
+  g.beginPath();g.ellipse(x+W*0.54,y+H*0.40,W*0.11,H*0.09,-0.25,0,7);g.fill();
+
   g.strokeStyle=INK;g.lineWidth=1.1;
   g.beginPath();
   g.moveTo(x,y-H);
-  g.bezierCurveTo(x+W*1.05, y-H*0.78, x+W*1.0,  y+H*0.30, x+W*0.52, y+H*0.80);
-  g.bezierCurveTo(x+W*0.24, y+H*1.02, x-W*0.24, y+H*1.02, x-W*0.52, y+H*0.80);
-  g.bezierCurveTo(x-W*1.0,  y+H*0.30, x-W*1.05, y-H*0.78, x, y-H);
+  g.bezierCurveTo(x+W*1.05, y-H*0.78, x+W*1.02, y+H*0.40, x+W*0.46, y+H*0.86);
+  g.bezierCurveTo(x+W*0.22, y+H*1.00, x-W*0.22, y+H*1.00, x-W*0.46, y+H*0.86);
+  g.bezierCurveTo(x-W*1.02, y+H*0.40, x-W*1.05, y-H*0.78, x, y-H);
   g.closePath();g.stroke();
 
-  // hair: a flat, greasy cap with a few soft strands past the jaw — skipped
-  // entirely under a head wrap, which should fully cover it
+  // hair: softened hairline (a shallow wave instead of a dead-flat bowl
+  // edge) with a slight side part, plus a few strands past the jaw
   const hd=shade(hair,-0.30);
   const wrapped=!!(opt&&opt.wrap);
   if(!wrapped){
     g.fillStyle=hair;
     g.beginPath();
-    g.moveTo(x-W*1.00, y-H*0.02);
-    g.bezierCurveTo(x-W*1.08, y-H*1.00, x+W*1.08, y-H*1.00, x+W*1.00, y-H*0.02);
-    g.bezierCurveTo(x+W*0.62, y-H*0.34, x+W*0.20, y-H*0.20,  x-W*0.10, y-H*0.38);
-    g.bezierCurveTo(x-W*0.44, y-H*0.24, x-W*0.72, y-H*0.32, x-W*1.00, y-H*0.02);
+    g.moveTo(x-W*1.00, y-H*0.04);
+    g.bezierCurveTo(x-W*1.08, y-H*1.00, x+W*1.08, y-H*1.00, x+W*1.00, y-H*0.04);
+    g.bezierCurveTo(x+W*0.66, y-H*0.40, x+W*0.30, y-H*0.16, x+W*0.02, y-H*0.34);
+    g.bezierCurveTo(x-W*0.26, y-H*0.50, x-W*0.60, y-H*0.30, x-W*0.84, y-H*0.40);
+    g.bezierCurveTo(x-W*0.94, y-H*0.34, x-W*0.98, y-H*0.18, x-W*1.00, y-H*0.04);
     g.closePath();g.fill();
-    // clumped into a few soft partings
-    g.strokeStyle="rgba(0,0,0,.28)";g.lineWidth=0.9;
+    g.strokeStyle="rgba(0,0,0,.26)";g.lineWidth=0.9;
     for(let i=0;i<4;i++){
       g.beginPath();
-      g.moveTo(x-W*0.62+i*W*0.42, y-H*0.94);
+      g.moveTo(x-W*0.62+i*W*0.42, y-H*0.92);
       g.quadraticCurveTo(x-W*0.50+i*W*0.44+jt(i+90)*4, y-H*0.54, x-W*0.66+i*W*0.46, y-H*0.22);
       g.stroke();
     }
     g.fillStyle="rgba(255,250,240,.10)";
     g.beginPath();g.ellipse(x-W*0.36,y-H*0.70,W*0.40,H*0.14,-0.35,0,7);g.fill();
-    // a handful of short strands hanging past the jaw — not a radiating crown
     for(let i=0;i<6;i++){
       const side=i<3?-1:1;
       const t2=(i%3)/2;
@@ -5036,8 +5042,13 @@ function drawFaceOn(g,x,y,r,skin,hair,mood,opt){
     }
   }
 
-  // eyes, sunk in but with a tiny highlight so they read as alive
+  // eyebrows — short, a little worn/thin, sit close over the eyes
   const ey=y-H*0.06, ex=W*0.38;
+  g.strokeStyle=rgba(hd,.70);g.lineWidth=Math.max(0.8,r*0.045);g.lineCap="round";
+  g.beginPath();g.moveTo(x-ex-1.5,ey-2.6);g.quadraticCurveTo(x-ex,ey-3.3,x-ex+1.5,ey-2.5);g.stroke();
+  g.beginPath();g.moveTo(x+ex-1.5,ey-2.5);g.quadraticCurveTo(x+ex,ey-3.3,x+ex+1.5,ey-2.6);g.stroke();
+
+  // eyes, sunk in but with a tiny highlight so they read as alive
   g.fillStyle="rgba(70,48,42,.14)";
   g.beginPath();g.ellipse(x-ex,ey+1.6,2.6,2.1,0,0,7);g.fill();
   g.beginPath();g.ellipse(x+ex,ey+1.6,2.6,2.1,0,0,7);g.fill();
@@ -5054,6 +5065,16 @@ function drawFaceOn(g,x,y,r,skin,hair,mood,opt){
     g.beginPath();g.arc(x-ex+0.35,ey-0.35,0.3,0,7);g.fill();
     g.beginPath();g.arc(x+ex+0.35,ey-0.35,0.3,0,7);g.fill();
   }
+
+  // nose — a simple soft bridge shadow plus a hint of a nostril shadow,
+  // enough to break up the empty space without reading as a cartoon beak
+  const nx=x, ny1=ey+1.2, ny2=y+H*0.20;
+  g.strokeStyle=rgba(skinDk,.45);g.lineWidth=Math.max(0.7,r*0.045);
+  g.beginPath();g.moveTo(nx+0.4,ny1);g.quadraticCurveTo(nx+1.3,(ny1+ny2)/2,nx+0.6,ny2);g.stroke();
+  g.fillStyle=rgba(skinDk,.30);
+  g.beginPath();g.ellipse(nx-1.2,ny2+0.6,0.9,0.55,0.2,0,7);g.fill();
+  g.beginPath();g.ellipse(nx+1.6,ny2+0.6,0.9,0.55,-0.2,0,7);g.fill();
+
   // mouth
   g.strokeStyle="rgba(110,66,58,.6)";g.lineWidth=0.9;
   g.beginPath();
@@ -5062,7 +5083,6 @@ function drawFaceOn(g,x,y,r,skin,hair,mood,opt){
   g.stroke();
 
   if(!opt) return;
-  // head wrapped, with the knot off to one side
   if(opt.wrap){
     g.fillStyle="#E4E0D4";
     g.beginPath();
