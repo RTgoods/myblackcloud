@@ -5156,15 +5156,8 @@ function drawBed(b){
     // procedurally drawn frame/mattress/face — the status-color outline
     // (green/yellow/red/teal, same as every other bed) still draws on top
     // so the at-a-glance vitals read stays intact.
-    // A slow breathing scale + a slower restless rotation — the clip rect
-    // stays fixed (clip() is set before the transform), so only the photo
-    // itself drifts within the bed frame, not the frame edges.
-    const bcx=px+W/2, bcy=py+(H-2)/2;
-    const breathe=1+Math.sin(t*1.3)*0.018;
-    const shift=Math.sin(t*0.42)*0.03;
     g.save();
     g.beginPath();g.roundRect(px,py,W,H-2,4);g.clip();
-    g.translate(bcx,bcy);g.rotate(shift);g.scale(breathe,breathe);g.translate(-bcx,-bcy);
     g.drawImage(BED1_IMAGE,px,py,W,H-2);
     g.restore();
     g.strokeStyle=c;g.lineWidth=.65;g.beginPath();g.roundRect(px,py,W,H-2,4);g.stroke();
