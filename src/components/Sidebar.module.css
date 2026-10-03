@@ -52,8 +52,8 @@
 }
 
 .avatar {
-  background: var(--background);
-  border: 1px solid #2c4147;
+  background: rgb(56 214 224 / 8%);
+  border: 1px solid var(--site-teal);
 }
 
 .accountName {
