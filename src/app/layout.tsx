@@ -5,7 +5,6 @@ import { Sidebar } from "@/components/Sidebar";
 import { MainContent } from "@/components/MainContent";
 import { createClient } from "@/lib/supabase/server";
 import { gameAccess } from "@/lib/game-access";
-import type { LevelStat } from "@/types/database";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,17 +31,15 @@ export default async function RootLayout({
   const { data: { user } } = await supabase.auth.getUser();
   const access = user ? await gameAccess(supabase, user) : null;
   let completedLevels: number[] = [];
-  let levelStats: Record<string, LevelStat> = {};
   let handle: string | null = null;
   let role: 'RT' | 'RN' = 'RT';
   let gender: 'male' | 'female' = 'male';
   if (user) {
     const [{ data: progress }, { data: profile }] = await Promise.all([
-      supabase.from('progress').select('completed_levels, level_stats').eq('user_id', user.id).maybeSingle(),
+      supabase.from('progress').select('completed_levels').eq('user_id', user.id).maybeSingle(),
       supabase.from('profiles').select('display_name, role, gender').eq('id', user.id).maybeSingle(),
     ]);
     completedLevels = progress?.completed_levels ?? [];
-    levelStats = progress?.level_stats ?? {};
     handle = profile?.display_name ?? null;
     role = profile?.role ?? 'RT';
     gender = profile?.gender ?? 'male';
@@ -62,7 +59,6 @@ export default async function RootLayout({
             unlocked={access?.allowed ?? false}
             isAdmin={access?.isAdmin ?? false}
             completedLevels={completedLevels}
-            levelStats={levelStats}
           />
           <MainContent>{children}</MainContent>
         </div>

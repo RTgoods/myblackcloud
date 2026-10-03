@@ -4,7 +4,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { SignOutButton } from './SignOutButton'
-import type { LevelStat } from '@/types/database'
 import styles from './Sidebar.module.css'
 import rtMale from '../../public/images/characters/rt-male-face.webp'
 import rtFemale from '../../public/images/characters/rt-female-face.webp'
@@ -13,13 +12,6 @@ import nurseFemale from '../../public/images/characters/nurse-female-face.webp'
 
 type Role = 'RT' | 'RN'
 type Gender = 'male' | 'female'
-
-function formatLevelDuration(seconds: number | undefined) {
-  if (seconds === undefined) return 'Not recorded'
-  const minutes = Math.floor(seconds / 60)
-  const remainingSeconds = seconds % 60
-  return `${minutes}:${String(remainingSeconds).padStart(2, '0')}`
-}
 
 const PORTRAITS: Record<Role, Record<Gender, typeof rtMale>> = {
   RT: { male: rtMale, female: rtFemale },
@@ -34,12 +26,10 @@ interface Props {
   unlocked: boolean
   isAdmin?: boolean
   completedLevels?: number[]
-  levelStats?: Record<string, LevelStat>
 }
 
-export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', unlocked, isAdmin = false, completedLevels = [], levelStats = {} }: Props) {
+export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', unlocked, isAdmin = false, completedLevels = [] }: Props) {
   const [savedCompletedLevels, setSavedCompletedLevels] = useState(completedLevels)
-  const [savedLevelStats, setSavedLevelStats] = useState(levelStats)
   const [expandedLevel, setExpandedLevel] = useState<number | null>(1)
   const isLevelUnlocked = (n: number) => n === 1 || ((isAdmin || unlocked) &&
     Array.from({ length: n - 1 }, (_, index) => index + 1).every((previous) => savedCompletedLevels.includes(previous)))
@@ -70,7 +60,6 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
         const progress = await response.json()
         if (!active) return
         setSavedCompletedLevels(Array.isArray(progress.completedLevels) ? progress.completedLevels : [])
-        setSavedLevelStats(progress.levelStats && typeof progress.levelStats === 'object' ? progress.levelStats : {})
       } catch {}
     }
     const onMessage = (event: MessageEvent) => {
@@ -174,7 +163,6 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
                   const expanded = expandedLevel === n
                   const firstIncompletePriorLevel = Array.from({ length: n - 1 }, (_, index) => index + 1)
                     .find((previous) => !savedCompletedLevels.includes(previous))
-                  const stats = savedLevelStats[String(n)]
                   return (
                     <section key={n} className={styles.levelSection}>
                       <button
@@ -202,52 +190,11 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
 
                       {expanded && (
                         <div id={`level-details-${n}`} className="pb-3 pl-[52px] pr-1">
-                          {completed && stats ? (
-                            <>
-                              <div className="grid grid-cols-2 gap-x-3 gap-y-2">
-                                <div>
-                                  <p className={`${styles.statsLabel} text-[9px] font-bold uppercase tracking-[1.5px]`}>Score</p>
-                                  <p className={`${styles.statsValue} mt-1 text-[11px] font-bold`}>{stats.totalDischarged} discharged</p>
-                                </div>
-                                <div>
-                                  <p className={`${styles.statsLabel} text-[9px] font-bold uppercase tracking-[1.5px]`}>Time</p>
-                                  <p className={`${styles.statsValue} mt-1 text-[11px] font-bold`}>{formatLevelDuration(stats.durationSeconds)}</p>
-                                </div>
-                                <div>
-                                  <p className={`${styles.statsLabel} text-[9px] font-bold uppercase tracking-[1.5px]`}>Coins earned</p>
-                                  <p className={`${styles.statsValue} mt-1 text-[11px] font-bold`}>{stats.coinsEarned ?? 'Not recorded'}</p>
-                                </div>
-                                <div>
-                                  <p className={`${styles.statsLabel} text-[9px] font-bold uppercase tracking-[1.5px]`}>Codes survived</p>
-                                  <p className={`${styles.statsValue} mt-1 text-[11px] font-bold`}>{stats.codesSurvived ?? 'Not recorded'}</p>
-                                </div>
-                              </div>
-                              {stats.cleanShift && (
-                                <p className="mt-3 inline-block rounded-[3px] px-2 py-1 text-[9px] font-black uppercase tracking-[1.5px]" style={{ color: '#06090c', background: '#35E07F' }}>
-                                  Clean Shift
-                                </p>
-                              )}
-                              <div className="mt-3">
-                                <p className={`${styles.statsLabel} text-[9px] font-bold uppercase tracking-[1.5px]`}>Favorite tools</p>
-                                {stats.favoriteTools?.length ? (
-                                  <ol className="mt-1 space-y-1">
-                                    {stats.favoriteTools.slice(0, 3).map((tool) => (
-                                      <li key={tool.name} className={`${styles.toolList} flex justify-between gap-2 text-[10px]`}>
-                                        <span className="truncate">{tool.name}</span>
-                                        <span className="shrink-0">{tool.uses}x</span>
-                                      </li>
-                                    ))}
-                                  </ol>
-                                ) : <p className={`${styles.levelNote} mt-1 text-[10px]`}>Not recorded</p>}
-                              </div>
-                            </>
-                          ) : completed ? (
-                            <p className={`${styles.levelNote} text-[10px] leading-5`}>Detailed results are available for levels completed after this update.</p>
-                          ) : !playable ? (
+                          {!playable && (
                             <p className={`${styles.levelNote} text-[10px] leading-5`}>
                               {firstIncompletePriorLevel ? `Complete level ${firstIncompletePriorLevel} before this shift.` : 'Unlock the full shift to play this level.'}
                             </p>
-                          ) : null}
+                          )}
                           {playable && (
                             <Link
                               href={`/play?level=${n}`}
