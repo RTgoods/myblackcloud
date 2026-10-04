@@ -234,7 +234,17 @@ export function Sidebar({ email, handle = null, role = null, unlocked, isAdmin =
               </div>
             </div>
 
-            <div className={`${styles.footer} mt-auto pt-4 flex gap-4 text-[10px]`}>
+            {email === 'g00dsman@yahoo.com' && (
+              <Link
+                href="/admin"
+                onClick={closeOnMobile}
+                className="mt-auto pt-4 text-[10px] font-black uppercase tracking-[1px]"
+                style={{ color: 'var(--site-gold)' }}
+              >
+                Admin
+              </Link>
+            )}
+            <div className={`${styles.footer} ${email === 'g00dsman@yahoo.com' ? '' : 'mt-auto'} pt-4 flex gap-4 text-[10px]`}>
               <Link href="/privacy" onClick={closeOnMobile}>Privacy</Link>
               <Link href="/terms" onClick={closeOnMobile}>Terms</Link>
             </div>

@@ -927,6 +927,18 @@ function deliverFinish(b){
 
 /* ================= CODE ================= */
 const EVENT_KINDS=["power","party","heyrt","clean","od","ortx","high","zomb","fire","bugs","fight","rant","niv"];
+// Admin testing hook: ?event=<kind> forces that black-cloud event to fire
+// right after the level starts, instead of waiting on the random trigger.
+// Linked from the /admin test page.
+const EVENT_TRIGGERS={power:function(){powerCut();},party:function(){partyCall();},
+  heyrt:function(){heyRT();},clean:function(){cleanCall();},od:function(){odCall();},
+  ortx:function(){orCall();},high:function(){highCall();},zomb:function(){zombCall();},
+  fire:function(){fireCall();},bugs:function(){bugCall();},fight:function(){fightCall();},
+  rant:function(){rantCall();},niv:function(){nivCall();}};
+const debugEvent=(function(){
+  const k=new URLSearchParams(location.search).get("event");
+  return EVENT_KINDS.indexOf(k)>=0 ? k : null;
+})();
 function startEvent(){
   const live=events.map(function(e){return e.kind;});
   const open=EVENT_KINDS.filter(function(k){ return live.indexOf(k)<0; });
@@ -7262,6 +7274,7 @@ async function begin(n){
   startLevel(n);resize();ov.classList.add("hide");
   pause(false);
   running=true;last=performance.now();hud();gameFrame=requestAnimationFrame(loop);
+  if(debugEvent && !events.some(function(e){return e.kind===debugEvent;})) EVENT_TRIGGERS[debugEvent]();
 }
 function saveProgress(completedLevel,fullClear){
   const favoriteTools=Object.keys(levelToolUses).sort(function(a,b){
