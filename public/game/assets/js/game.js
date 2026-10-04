@@ -1758,9 +1758,13 @@ function update(dt){
     evRoll=5+Math.random()*7;
     if(Math.random()<0.55){ cloudUsed=true; musicCloudActive=true; if(music) music.blackCloud(); startEvent(); }
   }
+  // a short grace period after the party starts — otherwise a party
+  // triggered before anyone's first care step (e.g. the admin test link,
+  // fired right at level start when inZone is always 0) fails the instant
+  // it begins
   if(inZone===0 && events.length){
-    events.forEach(function(e){ if(e.kind==="party") failEvent(e,"The cake went uneaten."); });
-    events=events.filter(function(e){ return e.kind!=="party"; });
+    events.forEach(function(e){ if(e.kind==="party" && e.t<PARTY_T-2) failEvent(e,"The cake went uneaten."); });
+    events=events.filter(function(e){ return !(e.kind==="party" && e.t<PARTY_T-2); });
   }
 
   // tick the live events
