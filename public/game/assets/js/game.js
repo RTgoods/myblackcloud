@@ -3099,12 +3099,13 @@ function bakeMap(){
     bc.fillStyle="#5A462F";bc.fillRect(px+TILE+2,py,4,h);
     bc.fillStyle="rgba(0,0,0,.2)";
     for(let i=1;i<3;i++) bc.fillRect(px,py+i*TILE-1,TILE+6,2);
-    // three monitors, turned to face whoever is sitting on the corridor side
+    // three monitors, turned to face whoever is sitting on the corridor side —
+    // set back toward the wall, with the keyboard in front of them
     for(let i=0;i<3;i++){
       const my=py+i*TILE+TILE/2;
       bc.save();
-      bc.translate(px+TILE-6,my);
-      bc.rotate(-Math.PI/2);                 // screens look east, at the chairs
+      bc.translate(px+13,my);
+      bc.rotate(Math.PI/2);                  // screens look east, at the chairs
       bc.fillStyle="rgba(0,0,0,.35)";bc.fillRect(-13,-6,26,15);
       bc.fillStyle="#39434D";bc.fillRect(-14,-8,28,17);
       bc.fillStyle="#080D11";bc.fillRect(-12,-6,24,13);
@@ -3121,10 +3122,10 @@ function bakeMap(){
       bc.strokeStyle=INK;bc.lineWidth=1.1;bc.strokeRect(-14,-8,28,17);
       bc.restore();
     }
-    // keyboards in front of each screen, on the desk
+    // keyboards in front of each screen, on the desk, nearer the chairs
     for(let i=0;i<3;i++){
       const ky=py+i*TILE+TILE/2;
-      bc.save();bc.translate(px+13,ky);bc.rotate(-Math.PI/2);
+      bc.save();bc.translate(px+TILE-6,ky);bc.rotate(Math.PI/2);
       bc.fillStyle="#20282F";bc.fillRect(-11,-4,22,8);
       bc.fillStyle="#4A5A66";
       for(let r2=0;r2<2;r2++)for(let c2=0;c2<6;c2++) bc.fillRect(-9+c2*3.2,-3+r2*3,2.2,1.8);
@@ -6595,26 +6596,6 @@ function draw(){
       g.fillStyle="#CBA57F";g.beginPath();g.arc(x1,y1,2.1,0,7);g.fill();
     });
   }
-  // a flashlight in hand during the power bump, held out in the direction
-  // the beam itself is thrown
-  if(blackout>0 && !carry){
-    const a=player.face===undefined?Math.PI/2:player.face;
-    const hx=player.x+Math.cos(a)*11, hy=player.y+Math.sin(a)*11;
-    g.save();g.translate(hx,hy);g.rotate(a+Math.PI/2);
-    g.fillStyle="rgba(0,0,0,.3)";g.beginPath();g.roundRect(-3.2,-1,6.4,11,1.5);g.fill();
-    g.fillStyle="#3A3F46";g.beginPath();g.roundRect(-3,-2,6,11,1.5);g.fill();
-    g.fillStyle="#52585F";g.beginPath();g.roundRect(-3.6,-5,7.2,4,1.5);g.fill();
-    const flick=0.85+Math.sin(t*23)*0.08+Math.sin(t*7.3)*0.05;
-    g.fillStyle="rgba(255,238,190,"+flick+")";g.beginPath();g.arc(0,-5,2,0,7);g.fill();
-    g.strokeStyle=INK;g.lineWidth=0.8;
-    g.beginPath();g.roundRect(-3,-2,6,11,1.5);g.stroke();
-    g.beginPath();g.roundRect(-3.6,-5,7.2,4,1.5);g.stroke();
-    g.restore();
-    // the hand gripping it
-    g.fillStyle=ppe?"#E4EEF2":"#CBA57F";
-    g.beginPath();g.arc(player.x+Math.cos(a)*8,player.y+Math.sin(a)*8,2.3,0,7);g.fill();
-  }
-
   // energy-drink trail — a ribbon of where you have just been
   if(trail.length>1){
     g.lineCap="round";g.lineJoin="round";
@@ -6840,17 +6821,18 @@ function draw(){
 
   // ---- power cut: flashlight only ----
   if(blackout>0){
+    // the beam, thrown in whatever direction the RT is facing
+    const a=(player.face===undefined?Math.PI/2:player.face);
     // the player isn't always screen-centered (desktop's camera is static
     // horizontally and clamped vertically), so the beam has to follow the
-    // real on-screen position, not the viewport center
-    const px=player.x*SC+oX, py=player.y*SC+oY;
+    // real on-screen position, not the viewport center — offset out to
+    // roughly where the holding hand is, not the body's center
+    const px=player.x*SC+oX+Math.cos(a)*11*SC, py=player.y*SC+oY+Math.sin(a)*11*SC;
     const fade=1;
     darkX.globalCompositeOperation="source-over";
     darkX.fillStyle="rgba(2,3,6,"+(0.955*fade)+")";
     darkX.fillRect(0,0,VW,VH);
     darkX.globalCompositeOperation="destination-out";
-    // the beam, thrown in whatever direction the RT is facing
-    const a=(player.face===undefined?Math.PI/2:player.face);
     const reach=Math.min(VW,VH)*0.60, spread=0.40;
     const bg2=darkX.createRadialGradient(px,py,10,px,py,reach);
     bg2.addColorStop(0,"rgba(0,0,0,1)");
