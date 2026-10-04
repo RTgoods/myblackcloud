@@ -224,7 +224,7 @@ const LUNCH={x0:10,x1:13,y0:35,y1:41};
 const EXIT_DOOR={x:0,y:38};      // doors in the west wall of the waiting room
 const DISCHARGE={x:1,y:38};      // stand here, in front of the doors
 const COFFEE={x:12,y:38};        // in front of the lunch room sink counter
-const PARTY ={x:11,y:36};
+const PARTY ={x:11,y:38};        // clear door-to-counter lane — y:36 used to sit under a table's chair
 const VEND  ={x:11,y:40};        // stand here to use the machine        // the cake always ends up on this table
 const CHAIR_BAY=[{x:6,y:36},{x:8,y:36},{x:6,y:40}];
 // wall between the utility rooms and the waiting / lunch rooms
@@ -3464,8 +3464,8 @@ function bakeMap(){
   })();
 
   // ---- lunch room ----
-  //  x 10..13, y 29..35.  Door is on the west wall at y=32, so the
-  //  band y=31..33 nearest x=10 is kept completely clear.
+  //  x 10..13, y 35..41.  Door is on the west wall at y=38, so the
+  //  band y=37..39 nearest x=10 is kept completely clear.
   (function(){
     const L=LUNCH;
     bc.textAlign="left";bc.font="600 8.5px 'IBM Plex Mono',monospace";
@@ -3503,7 +3503,7 @@ function bakeMap(){
       bc.beginPath();bc.arc(cx,cy-2.5,15.5,0,7);bc.stroke();
       return {cx:cx,cy:cy};
     }
-    // one table high, one low — both clear of the y=32 door lane
+    // one table high, one low — both clear of the y=38 door lane
     const t1=table(12.0*TILE, (L.y0+1.3)*TILE);
     // a mug on one, a tray on the other
     bc.fillStyle="#D8CFC0";bc.beginPath();bc.arc(t1.cx+6,t1.cy-7,3.8,0,7);bc.fill();
