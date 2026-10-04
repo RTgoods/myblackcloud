@@ -5,15 +5,18 @@ import { useEffect, useState } from 'react'
 import { SignOutButton } from './SignOutButton'
 import styles from './Sidebar.module.css'
 
+type Role = 'RT' | 'RN'
+
 interface Props {
   email: string | null
   handle?: string | null
+  role?: Role | null
   unlocked: boolean
   isAdmin?: boolean
   completedLevels?: number[]
 }
 
-export function Sidebar({ email, handle = null, unlocked, isAdmin = false, completedLevels = [] }: Props) {
+export function Sidebar({ email, handle = null, role = null, unlocked, isAdmin = false, completedLevels = [] }: Props) {
   const [savedCompletedLevels, setSavedCompletedLevels] = useState(completedLevels)
   const [expandedLevel, setExpandedLevel] = useState<number | null>(1)
   const isLevelUnlocked = (n: number) => n === 1 || ((isAdmin || unlocked) &&
@@ -140,9 +143,14 @@ export function Sidebar({ email, handle = null, unlocked, isAdmin = false, compl
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className={`${styles.accountName} ${email && unlocked ? styles.unlockedText : ''} truncate text-sm font-bold`}>{name ?? 'Guest'}</p>
-                  <p className={`${styles.accountStatus} ${email && unlocked ? styles.unlockedText : ''} mt-1 text-[10px]`}>
-                    {email ? unlocked ? 'All levels unlocked' : 'Level 1 free' : 'Level 1 free'}
-                  </p>
+                  {role && (
+                    <p className={`${styles.accountStatus} mt-1 text-[10px]`}>
+                      {role === 'RT' ? 'Respiratory Therapist' : 'Registered Nurse'}
+                    </p>
+                  )}
+                  {email && unlocked && (
+                    <p className={`${styles.accountStatus} ${styles.unlockedText} mt-1 text-[10px]`}>All levels unlocked</p>
+                  )}
                 </div>
                 {email && (
                   <Link href="/settings" onClick={closeOnMobile} className={`${styles.settingsLink} shrink-0 text-[10px] uppercase tracking-[1px]`}>
