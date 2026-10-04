@@ -6828,7 +6828,7 @@ function draw(){
     // real on-screen position, not the viewport center — offset out to the
     // right hand's actual drawn position (same arm math as drawPerson:
     // local point (9.9/0.82, 7), rotated by the body's own face-Math.PI/2)
-    const handLx=9.9/0.82-2.4, handLy=7, bodyRot=a-Math.PI/2;
+    const handLx=9.9/0.82-3.2, handLy=7, bodyRot=a-Math.PI/2;
     const handWx=handLx*Math.cos(bodyRot)-handLy*Math.sin(bodyRot);
     const handWy=handLx*Math.sin(bodyRot)+handLy*Math.cos(bodyRot);
     const px=player.x*SC+oX+handWx*SC, py=player.y*SC+oY+handWy*SC;
