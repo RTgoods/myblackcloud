@@ -315,6 +315,10 @@ body.paused #actBtn,body.paused #evt,body.paused #evtray{display:none !important
   letter-spacing:.16em;font-weight:700;padding:13px 34px;background:transparent;color:var(--hr);
   border:1px solid var(--hr);border-radius:3px}
 #ov.hide{display:none}
+/* CODE CALLED — same teal/gold palette as the site sidebar */
+#ov.ov-coded h1{color:#38D6E0}
+#ov.ov-coded p.k{color:#C9A227}
+#ov.ov-coded button{color:#38D6E0;border-color:#38D6E0}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 
 

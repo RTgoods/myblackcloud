@@ -7217,13 +7217,14 @@ function pause(on){
   if(!b||!b.classList) return;
   if(on) b.classList.add("paused"); else b.classList.remove("paused");
 }
-function screen(title,lines,btn,fn,alt){
+function screen(title,lines,btn,fn,alt,kind){
   running=false;
   ov.innerHTML="<h1>"+title+"</h1>"+lines.map(function(l){
     return "<p"+(l.k?' class="k"':"")+">"+l.t+"</p>";}).join("")+
     '<p class="motto">'+motto()+'</p>'+
     (alt? '<button id="alt" class="rescue">'+alt.t+"</button>" : "")+
     '<button id="go">'+btn+"</button>";
+  ov.classList.toggle("ov-coded",kind==="coded");
   ov.classList.remove("hide");
   pause(true);
   document.getElementById("go").onclick=fn;
@@ -7338,7 +7339,7 @@ function lose(b){
   screen("CODE CALLED",
     [{t:"Bed "+b.room.id+" didn't make it.",k:1},
      {t:"The cart was somewhere. It's always somewhere."}],
-    "RETRY LEVEL "+level,function(){begin(level);}, alt);
+    "RETRY LEVEL "+level,function(){begin(level);}, alt, "coded");
 }
 function loop(now){
   if(!running) return;
