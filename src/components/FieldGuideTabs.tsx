@@ -391,8 +391,8 @@ const ROLE_BUTTON = 'min-h-10 rounded-[4px] border px-4 text-[10px] font-black u
 
 export function FieldGuideTabs({ powerUps, respiratoryTools, nursingTools }: Props) {
   const [tab, setTab] = useState<'tools' | 'powerups'>('tools')
-  const [role, setRole] = useState<'RT' | 'RN'>('RT')
-  const items = tab === 'tools' ? role === 'RT' ? respiratoryTools : nursingTools : powerUps
+  const [role, setRole] = useState<'RT' | 'RN'>('RN')
+  const items = tab === 'tools' ? role === 'RN' ? nursingTools : respiratoryTools : powerUps
 
   return (
     <section className="border-b border-[#2a2e31] bg-[#0a0d10] px-4 py-14 sm:px-6 md:px-8 lg:py-20">
@@ -413,7 +413,7 @@ export function FieldGuideTabs({ powerUps, respiratoryTools, nursingTools }: Pro
             className={TAB_BUTTON}
             style={{ color: tab === 'tools' ? '#f2c94d' : '#9eaab0', background: tab === 'tools' ? '#005bbb' : '#101b21', borderColor: tab === 'tools' ? '#38d6e0' : '#2a3c47' }}
           >
-            Pack Tools · {role === 'RT' ? respiratoryTools.length : nursingTools.length}
+            Pack Tools · {role === 'RN' ? nursingTools.length : respiratoryTools.length}
           </button>
           <button
             id="field-guide-powerups-tab"
@@ -432,10 +432,10 @@ export function FieldGuideTabs({ powerUps, respiratoryTools, nursingTools }: Pro
         <div className="mb-4 flex min-h-8 flex-wrap items-center justify-between gap-3 text-[10px] font-bold uppercase tracking-[1.5px] text-[#91a8b5]">
           {tab === 'tools' ? (
             <>
-              <span>{role === 'RT' ? 'Respiratory therapy kit' : 'Nursing kit'} · {items.length} items</span>
+              <span>{role === 'RN' ? 'Nursing kit' : 'Respiratory therapy kit'} · {items.length} items</span>
               <div role="group" aria-label="Pack role" className="flex gap-2">
-                <button type="button" aria-pressed={role === 'RT'} className={ROLE_BUTTON} onClick={() => setRole('RT')} style={{ color: role === 'RT' ? '#06090c' : '#aab5bc', background: role === 'RT' ? '#38d6e0' : '#101b21', borderColor: role === 'RT' ? '#38d6e0' : '#2a3c47' }}>RT</button>
                 <button type="button" aria-pressed={role === 'RN'} className={ROLE_BUTTON} onClick={() => setRole('RN')} style={{ color: role === 'RN' ? '#06090c' : '#aab5bc', background: role === 'RN' ? '#38d6e0' : '#101b21', borderColor: role === 'RN' ? '#38d6e0' : '#2a3c47' }}>RN</button>
+                <button type="button" aria-pressed={role === 'RT'} className={ROLE_BUTTON} onClick={() => setRole('RT')} style={{ color: role === 'RT' ? '#06090c' : '#aab5bc', background: role === 'RT' ? '#38d6e0' : '#101b21', borderColor: role === 'RT' ? '#38d6e0' : '#2a3c47' }}>RT</button>
               </div>
             </>
           ) : (

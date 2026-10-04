@@ -20,7 +20,7 @@ export default async function SettingsPage() {
       userId={user.id}
       email={user.email ?? ''}
       initialHandle={profile?.display_name ?? ''}
-      initialRole={profile?.role ?? 'RT'}
+      initialRole={profile?.role ?? 'RN'}
     />
   )
 }

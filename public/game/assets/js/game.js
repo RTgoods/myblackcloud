@@ -46,7 +46,7 @@ function nextName(){
   if(!namePool.length) namePool=NAMES.slice().sort(function(){return Math.random()-0.5;});
   return namePool.pop();
 }
-let role="RT";                      // set on the start screen, or from the account's saved character
+let role="RN";                      // set on the start screen, or from the account's saved character
 let playerGender="male";            // from the account's saved character — cosmetic only, no mechanics depend on it
 const RT_KEYS=["SUCT","YANK","INLINE","ABG","VENTK","NC","NRB","FLOW",
                "XTREE","MDI","NEB","BVM","PEEP","ETCO2","TLUNG","MANO"];
