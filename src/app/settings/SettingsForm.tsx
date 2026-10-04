@@ -97,7 +97,7 @@ export function SettingsForm({ userId, email, initialHandle, initialRole }: Prop
               className="flex items-center justify-center rounded-sm"
               style={{ aspectRatio: '1/1', border: '1px solid #1D2831', background: 'rgba(56,214,224,0.06)' }}
             >
-              <span className="font-black" style={{ fontSize: 48, color: '#38D6E0' }}>{initial}</span>
+              <span className="font-black" style={{ fontSize: 48, color: '#C9A227' }}>{initial}</span>
             </div>
             <p className="mt-2 text-center text-[10px] uppercase tracking-[1px]" style={{ color: '#5C6D7A' }}>
               {role === 'RT' ? 'Respiratory Therapist' : 'Registered Nurse'}
