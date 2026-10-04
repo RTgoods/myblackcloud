@@ -183,7 +183,7 @@
 }
 
 .markerCompleted {
-  color: var(--site-teal);
+  color: var(--site-gold);
   border-color: var(--site-teal);
   background: rgb(56 214 224 / 8%);
 }
