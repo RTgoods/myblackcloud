@@ -6821,7 +6821,10 @@ function draw(){
 
   // ---- power cut: flashlight only ----
   if(blackout>0){
-    const px=VW/2, py=VH/2;
+    // the player isn't always screen-centered (desktop's camera is static
+    // horizontally and clamped vertically), so the beam has to follow the
+    // real on-screen position, not the viewport center
+    const px=player.x*SC+oX, py=player.y*SC+oY;
     const fade=1;
     darkX.globalCompositeOperation="source-over";
     darkX.fillStyle="rgba(2,3,6,"+(0.955*fade)+")";
@@ -6846,8 +6849,8 @@ function draw(){
     // monitors keep running on battery, so alarming beds still glow
     beds.forEach(function(b){
       if(b.state!=="code" && !(b.state==="active" && b.t/b.max<0.24)) return;
-      const bx=(b.room.bx+0.5)*TILE*SC + (VW/2-player.x*SC);
-      const by=(b.room.by+1)*TILE*SC + (VH/2-player.y*SC);
+      const bx=(b.room.bx+0.5)*TILE*SC + oX;
+      const by=(b.room.by+1)*TILE*SC + oY;
       if(bx<-80||bx>VW+80||by<-80||by>VH+80) return;
       const em=darkX.createRadialGradient(bx,by,4,bx,by,64);
       em.addColorStop(0,"rgba(0,0,0,.80)");
