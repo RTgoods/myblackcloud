@@ -243,8 +243,8 @@ export default async function Home() {
           <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
             <Link
               href={user ? '/play?level=1' : '/auth/login?mode=signup'}
-              className="inline-flex min-h-[52px] w-full items-center justify-center rounded-[4px] px-3 text-center text-[11px] font-black uppercase tracking-[3px] text-[#06090c] shadow-[0_12px_30px_rgba(201,162,39,0.35)] transition hover:-translate-y-0.5 hover:brightness-105"
-              style={{ background: 'linear-gradient(180deg,#E8C873 0%,#C9A227 100%)' }}
+              className="inline-flex min-h-[52px] w-full items-center justify-center rounded-[4px] px-3 text-center text-[11px] font-black uppercase tracking-[3px] text-[#06090c] shadow-[0_12px_30px_rgba(53,224,127,0.28)] transition hover:-translate-y-0.5 hover:brightness-105"
+              style={{ background: 'linear-gradient(180deg,#6FE0A8 0%,#2BA86B 100%)' }}
             >
               {user ? 'Play Level 1 Free' : 'Sign Up to Play Level 1 Free'}
             </Link>
@@ -340,8 +340,8 @@ export default async function Home() {
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                 <Link
                   href={user ? '/play' : '/auth/login?mode=signup'}
-                  className="inline-flex min-h-[52px] w-full items-center justify-center rounded-[4px] px-7 text-[11px] font-black uppercase tracking-[3px] text-[#06090c] shadow-[0_12px_30px_rgba(201,162,39,0.35)] transition hover:-translate-y-0.5 hover:brightness-105 sm:w-60"
-                  style={{ background: 'linear-gradient(180deg,#E8C873 0%,#C9A227 100%)' }}
+                  className="inline-flex min-h-[52px] w-full items-center justify-center rounded-[4px] px-7 text-[11px] font-black uppercase tracking-[3px] text-[#06090c] shadow-[0_12px_30px_rgba(53,224,127,0.28)] transition hover:-translate-y-0.5 hover:brightness-105 sm:w-60"
+                  style={{ background: 'linear-gradient(180deg,#6FE0A8 0%,#2BA86B 100%)' }}
                 >
                   {user ? 'Open the Shift' : 'Sign Up'}
                 </Link>
