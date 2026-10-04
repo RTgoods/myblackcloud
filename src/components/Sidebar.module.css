@@ -47,7 +47,7 @@
 }
 
 .tagline {
-  color: var(--foreground);
+  color: var(--site-gold);
   font-family: var(--font-barlow-condensed), sans-serif;
   font-size: 11px;
   letter-spacing: 2px;
