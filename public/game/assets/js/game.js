@@ -7223,22 +7223,32 @@ let startRequest=0;
 async function begin(n){
   const request=++startRequest;
   SFX.start();
-  if(n>1 && !localTestMode){
+  if(!localTestMode){
     const allowed=await refreshAccess();
     if(request!==startRequest) return;
-    if(!allowed){
-      screen("UNLOCK YOUR SHIFT",[
-        {t:"Level 1 is free. Unlock levels 2–8 to continue.",k:1},
-        {t:accessUnavailable?"Account service unavailable. Try again shortly.":"Sign in with your account or unlock the full game."}],
-        "PLAY FREE LEVEL",function(){begin(1);});
-      setMenu(true);return;
-    }
-    if(!isLevelUnlocked(n)){
-      screen("LEVEL LOCKED",[
-        {t:"Clear Level "+(n-1)+" first to open Level "+n+".",k:1},
-        {t:"Your purchase unlocks every level — but each one opens once the last is solved."}],
-        "PLAY LEVEL "+(n-1),function(){begin(n-1);});
-      setMenu(true);return;
+    if(n<=1){
+      if(!isSignedIn && !isAdmin){
+        screen("SIGN IN TO PLAY",[
+          {t:"Level 1 is free — sign in to start your shift.",k:1},
+          {t:accessUnavailable?"Account service unavailable. Try again shortly.":"Create an account or sign in, it only takes a moment."}],
+          "SIGN IN / SIGN UP",function(){window.location.href="/auth/login?redirect=%2Fgame";});
+        setMenu(true);return;
+      }
+    } else {
+      if(!allowed){
+        screen("UNLOCK YOUR SHIFT",[
+          {t:"Level 1 is free. Unlock levels 2–8 to continue.",k:1},
+          {t:accessUnavailable?"Account service unavailable. Try again shortly.":"Sign in with your account or unlock the full game."}],
+          "PLAY FREE LEVEL",function(){begin(1);});
+        setMenu(true);return;
+      }
+      if(!isLevelUnlocked(n)){
+        screen("LEVEL LOCKED",[
+          {t:"Clear Level "+(n-1)+" first to open Level "+n+".",k:1},
+          {t:"Your purchase unlocks every level — but each one opens once the last is solved."}],
+          "PLAY LEVEL "+(n-1),function(){begin(n-1);});
+        setMenu(true);return;
+      }
     }
   }
   if(!desktopLayout.matches) setMenu(false);
@@ -7337,7 +7347,7 @@ function loop(now){
 })();
 let selectedLevel=1, hasFullAccess=false, accessUnavailable=false, isAdmin=false, isSignedIn=false, completedLevels=[];
 function isLevelUnlocked(n){
-  if(n<=1) return true;
+  if(n<=1) return isSignedIn||isAdmin;
   if(!isAdmin&&!hasFullAccess) return false;
   for(let previous=1;previous<n;previous++) if(completedLevels.indexOf(previous)===-1) return false;
   return true;
