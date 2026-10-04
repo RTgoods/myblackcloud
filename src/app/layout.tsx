@@ -40,17 +40,13 @@ export default async function RootLayout({
   const access = user ? await gameAccess(supabase, user) : null;
   let completedLevels: number[] = [];
   let handle: string | null = null;
-  let role: 'RT' | 'RN' = 'RT';
-  let gender: 'male' | 'female' = 'male';
   if (user) {
     const [{ data: progress }, { data: profile }] = await Promise.all([
       supabase.from('progress').select('completed_levels').eq('user_id', user.id).maybeSingle(),
-      supabase.from('profiles').select('display_name, role, gender').eq('id', user.id).maybeSingle(),
+      supabase.from('profiles').select('display_name').eq('id', user.id).maybeSingle(),
     ]);
     completedLevels = progress?.completed_levels ?? [];
     handle = profile?.display_name ?? null;
-    role = profile?.role ?? 'RT';
-    gender = profile?.gender ?? 'male';
   }
 
   return (
@@ -62,8 +58,6 @@ export default async function RootLayout({
           <Sidebar
             email={user?.email ?? null}
             handle={handle}
-            role={role}
-            gender={gender}
             unlocked={access?.allowed ?? false}
             isAdmin={access?.isAdmin ?? false}
             completedLevels={completedLevels}

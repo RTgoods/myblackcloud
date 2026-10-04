@@ -11,7 +11,7 @@ export default async function SettingsPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('display_name, role, gender')
+    .select('display_name, role')
     .eq('id', user.id)
     .maybeSingle()
 
@@ -21,7 +21,6 @@ export default async function SettingsPage() {
       email={user.email ?? ''}
       initialHandle={profile?.display_name ?? ''}
       initialRole={profile?.role ?? 'RT'}
-      initialGender={profile?.gender ?? 'male'}
     />
   )
 }

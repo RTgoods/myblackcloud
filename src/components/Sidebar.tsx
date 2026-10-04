@@ -1,40 +1,25 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { SignOutButton } from './SignOutButton'
 import styles from './Sidebar.module.css'
-import rtMale from '../../public/images/characters/rt-male-face.webp'
-import rtFemale from '../../public/images/characters/rt-female-face.webp'
-import nurseMale from '../../public/images/characters/nurse-male-face.webp'
-import nurseFemale from '../../public/images/characters/nurse-female-face.webp'
-
-type Role = 'RT' | 'RN'
-type Gender = 'male' | 'female'
-
-const PORTRAITS: Record<Role, Record<Gender, typeof rtMale>> = {
-  RT: { male: rtMale, female: rtFemale },
-  RN: { male: nurseMale, female: nurseFemale },
-}
 
 interface Props {
   email: string | null
   handle?: string | null
-  role?: Role
-  gender?: Gender
   unlocked: boolean
   isAdmin?: boolean
   completedLevels?: number[]
 }
 
-export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', unlocked, isAdmin = false, completedLevels = [] }: Props) {
+export function Sidebar({ email, handle = null, unlocked, isAdmin = false, completedLevels = [] }: Props) {
   const [savedCompletedLevels, setSavedCompletedLevels] = useState(completedLevels)
   const [expandedLevel, setExpandedLevel] = useState<number | null>(1)
   const isLevelUnlocked = (n: number) => n === 1 || ((isAdmin || unlocked) &&
     Array.from({ length: n - 1 }, (_, index) => index + 1).every((previous) => savedCompletedLevels.includes(previous)))
   const name = handle?.trim() || email?.split('@')[0] || null
-  const portrait = PORTRAITS[role][gender]
+  const initial = (name || '?').trim().charAt(0).toUpperCase() || '?'
   const [open, setOpen] = useState(true)
   const close = () => setOpen(false)
   // Dismiss the overlay drawer on mobile after navigating, but leave the
@@ -150,8 +135,8 @@ export function Sidebar({ email, handle = null, role = 'RT', gender = 'male', un
           <>
             <div className="mt-4 mb-2 flex flex-col gap-2 text-[11px]">
               <div className={`${styles.accountCard} flex items-center gap-3 rounded-[4px] p-3`}>
-                <span className={`${styles.avatar} relative block h-10 w-10 shrink-0 overflow-hidden rounded-full`}>
-                  <Image src={portrait} alt="" fill className="object-cover" sizes="40px" />
+                <span className={`${styles.avatar} flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-black`} aria-hidden="true">
+                  {initial}
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className={`${styles.accountName} ${email && unlocked ? styles.unlockedText : ''} truncate text-sm font-bold`}>{name ?? 'Guest'}</p>

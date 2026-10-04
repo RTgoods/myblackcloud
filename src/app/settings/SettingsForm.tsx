@@ -1,22 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import rtMale from '../../../public/images/characters/rt-male.webp'
-import rtFemale from '../../../public/images/characters/rt-female.webp'
-import nurseMale from '../../../public/images/characters/nurse-male.webp'
-import nurseFemale from '../../../public/images/characters/nurse-female.webp'
 
 type Role = 'RT' | 'RN'
-type Gender = 'male' | 'female'
-
-const PORTRAITS: Record<Role, Record<Gender, typeof rtMale>> = {
-  RT: { male: rtMale, female: rtFemale },
-  RN: { male: nurseMale, female: nurseFemale },
-}
 
 const labelStyle: React.CSSProperties = {
   display: 'block', fontSize: 12, letterSpacing: 1, textTransform: 'uppercase',
@@ -49,20 +38,18 @@ interface Props {
   email: string
   initialHandle: string
   initialRole: Role
-  initialGender: Gender
 }
 
-export function SettingsForm({ userId, email, initialHandle, initialRole, initialGender }: Props) {
+export function SettingsForm({ userId, email, initialHandle, initialRole }: Props) {
   const [handle, setHandle] = useState(initialHandle)
   const [role, setRole] = useState<Role>(initialRole)
-  const [gender, setGender] = useState<Gender>(initialGender)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const router = useRouter()
   const supabase = useMemo(() => createClient(), [])
 
-  const portrait = PORTRAITS[role][gender]
+  const initial = (handle.trim() || email).trim().charAt(0).toUpperCase() || '?'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -79,7 +66,7 @@ export function SettingsForm({ userId, email, initialHandle, initialRole, initia
     try {
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ display_name: trimmed || null, role, gender })
+        .update({ display_name: trimmed || null, role })
         .eq('id', userId)
       if (updateError) setError(updateError.message)
       else {
@@ -106,8 +93,11 @@ export function SettingsForm({ userId, email, initialHandle, initialRole, initia
 
         <div className="rounded-sm p-6 flex flex-col gap-6 sm:flex-row sm:items-start" style={{ background: '#0C1116', border: '1px solid #1D2831', boxShadow: '0 12px 40px rgba(0,0,0,0.6)' }}>
           <div className="mx-auto w-[140px] shrink-0 sm:mx-0">
-            <div className="relative overflow-hidden rounded-sm" style={{ aspectRatio: '520/780', border: '1px solid #1D2831', background: '#06090C' }}>
-              <Image src={portrait} alt={`${role === 'RT' ? 'Respiratory Therapist' : 'Nurse'} character preview`} fill className="object-cover" sizes="140px" />
+            <div
+              className="flex items-center justify-center rounded-sm"
+              style={{ aspectRatio: '1/1', border: '1px solid #1D2831', background: 'rgba(56,214,224,0.06)' }}
+            >
+              <span className="font-black" style={{ fontSize: 48, color: '#38D6E0' }}>{initial}</span>
             </div>
             <p className="mt-2 text-center text-[10px] uppercase tracking-[1px]" style={{ color: '#5C6D7A' }}>
               {role === 'RT' ? 'Respiratory Therapist' : 'Registered Nurse'}
@@ -135,14 +125,6 @@ export function SettingsForm({ userId, email, initialHandle, initialRole, initia
               <div className="flex gap-2">
                 <ToggleButton active={role === 'RT'} onClick={() => setRole('RT')}>RT</ToggleButton>
                 <ToggleButton active={role === 'RN'} onClick={() => setRole('RN')}>Nurse</ToggleButton>
-              </div>
-            </div>
-
-            <div>
-              <label style={labelStyle}>Gender</label>
-              <div className="flex gap-2">
-                <ToggleButton active={gender === 'male'} onClick={() => setGender('male')}>Man</ToggleButton>
-                <ToggleButton active={gender === 'female'} onClick={() => setGender('female')}>Woman</ToggleButton>
               </div>
             </div>
 
