@@ -977,7 +977,7 @@ function powerCut(){
   log("Power bump. Find the electrician and walk him to the panel in dirty utility.",true);
 }
 function partyCall(){
-  events.push({kind:"party",t:PARTY_T,max:PARTY_T});
+  events.push({kind:"party",t:PARTY_T,max:PARTY_T,wasPopulated:false});
   SFX.party();
   showBanner("ANOTHER BIRTHDAY PARTY","party",3.4);
   log("Another birthday party in the lunch room. Attendance is apparently mandatory.",true);
@@ -1758,13 +1758,15 @@ function update(dt){
     evRoll=5+Math.random()*7;
     if(Math.random()<0.55){ cloudUsed=true; musicCloudActive=true; if(music) music.blackCloud(); startEvent(); }
   }
-  // a short grace period after the party starts — otherwise a party
-  // triggered before anyone's first care step (e.g. the admin test link,
-  // fired right at level start when inZone is always 0) fails the instant
-  // it begins
-  if(inZone===0 && events.length){
-    events.forEach(function(e){ if(e.kind==="party" && e.t<PARTY_T-2) failEvent(e,"The cake went uneaten."); });
-    events=events.filter(function(e){ return !(e.kind==="party" && e.t<PARTY_T-2); });
+  // only auto-fail a party if the unit WAS staffed with an active patient
+  // during it and then emptied out — not if it simply never had one yet
+  // (a party triggered before anyone's first care step, e.g. the admin
+  // test link at level start, must not die before it's even reachable)
+  for(let i=events.length-1;i>=0;i--){
+    const e=events[i];
+    if(e.kind!=="party") continue;
+    if(inZone>0) e.wasPopulated=true;
+    else if(e.wasPopulated){ failEvent(e,"The cake went uneaten."); events.splice(i,1); }
   }
 
   // tick the live events
