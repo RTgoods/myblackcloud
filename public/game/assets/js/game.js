@@ -6825,9 +6825,13 @@ function draw(){
     const a=(player.face===undefined?Math.PI/2:player.face);
     // the player isn't always screen-centered (desktop's camera is static
     // horizontally and clamped vertically), so the beam has to follow the
-    // real on-screen position, not the viewport center — offset out to
-    // roughly where the holding hand is, not the body's center
-    const px=player.x*SC+oX+Math.cos(a)*11*SC, py=player.y*SC+oY+Math.sin(a)*11*SC;
+    // real on-screen position, not the viewport center — offset out to the
+    // right hand's actual drawn position (same arm math as drawPerson:
+    // local point (9.9/0.82, 7), rotated by the body's own face-Math.PI/2)
+    const handLx=9.9/0.82, handLy=7, bodyRot=a-Math.PI/2;
+    const handWx=handLx*Math.cos(bodyRot)-handLy*Math.sin(bodyRot);
+    const handWy=handLx*Math.sin(bodyRot)+handLy*Math.cos(bodyRot);
+    const px=player.x*SC+oX+handWx*SC, py=player.y*SC+oY+handWy*SC;
     const fade=1;
     darkX.globalCompositeOperation="source-over";
     darkX.fillStyle="rgba(2,3,6,"+(0.955*fade)+")";
