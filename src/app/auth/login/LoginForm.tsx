@@ -92,18 +92,22 @@ export function LoginForm() {
             {mode !== 'recovery' && (
               <div>
                 <label htmlFor="password" className="block text-[12px] tracking-[1px] uppercase font-black mb-2" style={{ color: '#C9A227' }}>Password</label>
-                <div className="relative">
+                <div className="flex items-stretch" style={{ ...inputStyle, padding: 0 }}>
                   <input
                     id="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} type={showPassword ? 'text' : 'password'}
                     value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
-                    placeholder="Min. 6 characters" style={{ ...inputStyle, paddingRight: 56 }}
+                    placeholder="Min. 6 characters"
+                    style={{
+                      flex: 1, minWidth: 0, padding: '12px 14px', background: 'transparent',
+                      border: 'none', outline: 'none', color: 'inherit', fontSize: 'inherit', letterSpacing: 'inherit',
+                    }}
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(s => !s)}
+                    onClick={() => setShowPassword((s) => !s)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                     aria-pressed={showPassword}
-                    className="absolute right-0 top-0 h-full px-3 text-[11px] font-black uppercase tracking-[0.5px]"
+                    className="shrink-0 px-4 text-[11px] font-black uppercase tracking-[0.5px]"
                     style={{ color: '#38D6E0' }}
                   >
                     {showPassword ? 'Hide' : 'Show'}
