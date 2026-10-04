@@ -150,6 +150,11 @@ export function Sidebar({ email, handle = null, unlocked, isAdmin = false, compl
                   </Link>
                 )}
               </div>
+              {email && (
+                <Link href="/settings" onClick={closeOnMobile} className={`${styles.settingsLink} block text-[10px] uppercase tracking-[1px]`}>
+                  Pick Player Type
+                </Link>
+              )}
               <div className={`${styles.accountAction} ${email ? styles.accountActionSecondary : styles.accountActionPrimary} rounded-[4px] px-2 py-2.5 text-center text-[10px] font-bold uppercase tracking-[1px]`}>
                 {email ? <SignOutButton /> : (
                   <Link href="/auth/login" onClick={closeOnMobile} className="block">

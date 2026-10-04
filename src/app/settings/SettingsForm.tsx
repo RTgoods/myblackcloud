@@ -83,7 +83,7 @@ export function SettingsForm({ userId, email, initialHandle, initialRole }: Prop
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-16" style={{ background: '#06090C' }}>
       <div className="w-full max-w-2xl">
-        <Link href="/" className="inline-block mb-6 py-2 text-sm font-bold" style={{ color: '#38D6E0' }}>← Back to MyBlackCloud</Link>
+        <Link href="/" className="inline-block mb-6 py-2 text-sm font-bold" style={{ color: '#38D6E0' }}>← Back to MyBlackCloud Main</Link>
 
         <div className="text-center mb-8">
           <p className="text-[11px] font-black tracking-[3px] uppercase mb-3" style={{ color: '#C9A227' }}>Your Shift Profile</p>
