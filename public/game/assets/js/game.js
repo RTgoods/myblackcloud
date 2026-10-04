@@ -6595,6 +6595,25 @@ function draw(){
       g.fillStyle="#CBA57F";g.beginPath();g.arc(x1,y1,2.1,0,7);g.fill();
     });
   }
+  // a flashlight in hand during the power bump, held out in the direction
+  // the beam itself is thrown
+  if(blackout>0 && !carry){
+    const a=player.face===undefined?Math.PI/2:player.face;
+    const hx=player.x+Math.cos(a)*11, hy=player.y+Math.sin(a)*11;
+    g.save();g.translate(hx,hy);g.rotate(a+Math.PI/2);
+    g.fillStyle="rgba(0,0,0,.3)";g.beginPath();g.roundRect(-3.2,-1,6.4,11,1.5);g.fill();
+    g.fillStyle="#3A3F46";g.beginPath();g.roundRect(-3,-2,6,11,1.5);g.fill();
+    g.fillStyle="#52585F";g.beginPath();g.roundRect(-3.6,-5,7.2,4,1.5);g.fill();
+    const flick=0.85+Math.sin(t*23)*0.08+Math.sin(t*7.3)*0.05;
+    g.fillStyle="rgba(255,238,190,"+flick+")";g.beginPath();g.arc(0,-5,2,0,7);g.fill();
+    g.strokeStyle=INK;g.lineWidth=0.8;
+    g.beginPath();g.roundRect(-3,-2,6,11,1.5);g.stroke();
+    g.beginPath();g.roundRect(-3.6,-5,7.2,4,1.5);g.stroke();
+    g.restore();
+    // the hand gripping it
+    g.fillStyle=ppe?"#E4EEF2":"#CBA57F";
+    g.beginPath();g.arc(player.x+Math.cos(a)*8,player.y+Math.sin(a)*8,2.3,0,7);g.fill();
+  }
 
   // energy-drink trail — a ribbon of where you have just been
   if(trail.length>1){
