@@ -122,16 +122,16 @@ const localTestMode=false;
 let startRequest=0;`);
 
 // Strip the entire dev-only devbar block: from `if(localPreview){` through
-// its matching close, right before the final `setMenu(desktopLayout.matches);`
+// its matching close, right before the final `setMenu(desktopLayout.matches && !embedded);`
 // that starts the game. Matched structurally (not by exact body text) since
 // the devbar's button list changes more often than the rest of this file.
 const devbarStart = js.indexOf('if(localPreview){');
-// There are two "setMenu(desktopLayout.matches);" occurrences (one inside an
-// earlier addEventListener callback); the one that ends the devbar block is
-// the last one in the file, so search forward from devbarStart.
-const devbarEnd = js.indexOf('setMenu(desktopLayout.matches);', devbarStart);
+// There are two "setMenu(desktopLayout.matches && !embedded);" occurrences
+// (one inside an earlier addEventListener callback); the one that ends the
+// devbar block is the last one in the file, so search forward from devbarStart.
+const devbarEnd = js.indexOf('setMenu(desktopLayout.matches && !embedded);', devbarStart);
 if (devbarStart === -1 || devbarEnd === -1 || devbarEnd < devbarStart) {
-  throw new Error('sync-game: could not locate the devbar block (if(localPreview){ ... setMenu(desktopLayout.matches);) to strip. BlackCloud\'s source has likely changed — update scripts/sync-game.mjs.');
+  throw new Error('sync-game: could not locate the devbar block (if(localPreview){ ... setMenu(desktopLayout.matches && !embedded);) to strip. BlackCloud\'s source has likely changed — update scripts/sync-game.mjs.');
 }
 js = js.slice(0, devbarStart) + js.slice(devbarEnd);
 

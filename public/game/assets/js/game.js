@@ -288,7 +288,7 @@ function path(sx,sy,tx,ty){
 
 /* ================= STATE ================= */
 let SLOTS=6, EMAX=100, packUp=false, tankUp=false;
-const DROP_T=1.4, DIRTY_T=1.0, CART_T=1.8, CODE_T=32, CHAIR_T=1.5, COFFEE_T=1.2, EQUIP_T=1.3, PRIZE_RUSH=30, READY_T=75, PARTY_T=26, PARTY_HOLD=1.4, HEY_T=20, CLEAN_T=85, OD_T=55, OD_HOLD=1.8, ORTX_T=80, PPE_T=1.6, ORLOAD_T=1.8, REC_T=1.8, HIGH_T=70, SPARK_T=2.6, ZOMB_T=60, FIRE_T=55, SHOT_CD=0.34, ZOMB_AGGRO=132, ZOMB_WALK=34, BUG_T=50, JUMP_T=0.52, STOMP_R=19, VEND_T=1.0, POW_MAX=6, FIGHT_T=45, FIGHT_HOLD=2.4, RANT_T=70, RANT_HOLD=15, NIV_T=60, NIV_HOLD=2.0;
+const DROP_T=1.4, DIRTY_T=1.0, CART_T=1.8, CODE_T=32, CHAIR_T=1.5, COFFEE_T=1.2, EQUIP_T=1.3, PRIZE_RUSH=30, READY_T=75, PARTY_T=26, PARTY_HOLD=1.4, HEY_T=20, CLEAN_T=85, OD_T=55, OD_HOLD=1.8, ORTX_T=80, PPE_T=1.6, ORLOAD_T=1.8, REC_T=1.8, HIGH_T=70, SPARK_T=2.6, ZOMB_T=60, FIRE_T=55, SHOT_CD=0.34, ZOMB_AGGRO=132, ZOMB_WALK=34, BUG_T=50, JUMP_T=0.52, STOMP_R=19, VEND_T=1.0, POW_MAX=6, FIGHT_T=45, FIGHT_HOLD=2.4, RANT_T=70, RANT_HOLD=15, NIV_T=60, NIV_HOLD=2.0, SWARM_EXTRA=4;
 let level=1, savedCount=0, beds=[], pack=[], loose=[], staff=[], fx=[];
 let player, keys={}, act=false, actHeld=false, running=false, sel=0, selLock=0;
 let t=0, flavorT=8, dropP=0, dirtyP=0, cart=null, carts=[], codeBed=null, moving=false;
@@ -796,10 +796,19 @@ document.addEventListener("touchmove",function(e){
   e.preventDefault();},{passive:false});
 
 /* ================= MOVEMENT ================= */
-function blocked(nx,ny){
+// the stretcher's footprint runs ~2 to ~44 ahead of whoever's pushing it
+// (see the orpatient draw block) — just a single forward probe, well short
+// of the full length, so single-tile doorways and corner turns still clear
+function orBedBlocked(px,py,ang){
+  const front=26;
+  const x=px+Math.cos(ang)*front, y=py+Math.sin(ang)*front;
+  return !walkable(Math.floor(x/TILE),Math.floor(y/TILE));
+}
+function blocked(nx,ny,ang){
   const r=9;
   const pts=[[nx-r,ny-r],[nx+r,ny-r],[nx-r,ny+r],[nx+r,ny+r]];
   for(let i=0;i<4;i++) if(!walkable(Math.floor(pts[i][0]/TILE),Math.floor(pts[i][1]/TILE))) return true;
+  if(carry==="orpatient" && orBedBlocked(nx,ny,ang===undefined?player.face:ang)) return true;
   // no gown, no entry — the OR block or an isolation room
   if(!ppe && restricted(Math.floor(nx/TILE), Math.floor((ny+r)/TILE))){
     if(ppeWarn<=0){ ppeWarn=2.4;
@@ -815,10 +824,10 @@ function crowdFactor(){
     const d=Math.hypot(player.x-staff[i].x, player.y-staff[i].y);
     if(d<30) drag += (1 - d/30);
   }
-  const floor = swarm>0 ? 0.18 : 0.3;
-  return Math.max(floor, 1 - drag*(swarm>0?0.52:0.42));
+  const floor = swarm>0 ? 0.11 : 0.3;
+  return Math.max(floor, 1 - drag*(swarm>0?0.64:0.42));
 }
-function slide(dx,dy){ if(!blocked(player.x+dx,player.y+dy)){player.x+=dx;player.y+=dy;} }
+function slide(dx,dy,ang){ if(!blocked(player.x+dx,player.y+dy,ang)){player.x+=dx;player.y+=dy;} }
 /* full speed while rested, dragging down to a trudge on empty */
 /* four gears: you drop one every quarter of the bar */
 const GEARS=[1.00, 0.86, 0.72, 0.58];
@@ -844,8 +853,9 @@ function move(dt){
                : carry==="equip" ? 0.66 : carry==="chair" ? 0.86 : 1;
     const sp=142*load*(rush>0?1.75:staminaFactor()*(boost>0?1.18:1))*mag*cf*dt;
     const oldX=player.x, oldY=player.y;
-    slide(dx*sp,0); slide(0,dy*sp);
-    player.face=Math.atan2(dy,dx);
+    const faceDir=Math.atan2(dy,dx);
+    slide(dx*sp,0,faceDir); slide(0,dy*sp,faceDir);
+    player.face=faceDir;
     const travelled=Math.hypot(player.x-oldX,player.y-oldY);
     moving=travelled>0.01;
     player.phase=(player.phase||0)+travelled*0.155;
@@ -987,12 +997,25 @@ const HEY_LINES=["Hey RT!","Hey RT — quick question.","RT! Got a sec?",
   "Sorry — RT? RT!","Did anyone page you?","Just one thing, quick.",
   "You're the RT, right?","Hey! Respiratory!","My machine's beeping.",
   "Not urgent. Well. Sort of.","Can you turn that alarm off?"];
+const HEY_LINES_RN=["Hey RN!","Hey RN — quick question.","RN! Got a sec?",
+  "Can you grab vitals on bed 2?","Her IV's beeping again.","RN, while you're here...",
+  "Sorry — RN? RN!","Did anyone page you?","Just one thing, quick.",
+  "You're her nurse, right?","Call bell's been going.","Can you sign off on this?",
+  "Not urgent. Well. Sort of.","Family's asking for an update."];
+function heyLines(){ return role==="RN" ? HEY_LINES_RN : HEY_LINES; }
 function heyRT(){
   events.push({kind:"heyrt",t:HEY_T,max:HEY_T});
   swarm=HEY_T; shouts=[];
+  const before=staff.length;
+  spawnStaff(SWARM_EXTRA,false);
+  for(let i=before;i<staff.length;i++) staff[i].swarmTemp=true;
   SFX.heyRT();
-  showBanner("HEY RT","hey",3.2);
+  showBanner(role==="RN"?"HEY RN":"HEY RT","hey",3.2);
   log("Everyone on the unit needs you. All at once. As usual.",true);
+}
+function endHeySwarm(){
+  swarm=0; shouts=[];
+  for(let i=staff.length-1;i>=0;i--) if(staff[i].swarmTemp) staff.splice(i,1);
 }
 const PRIZE_EVENTS=["party"];   // "clean" hands out A Friend specifically        // these hand out a power; the rest you just survive
 function grantPower(key){
@@ -1376,7 +1399,7 @@ function usePower(i){
   else if(key==="TANK"){ energy=EMAX; warnedE=energyTier(); gearFlash=0.9;
     showBanner("FULL TANK","ok",2.2); log("Full tank."); }
   else if(key==="CALM"){
-    swarm=0; shouts=[];
+    endHeySwarm();
     for(let j=events.length-1;j>=0;j--) if(events[j].kind==="heyrt") events.splice(j,1);
     beds.forEach(function(b){
       if(b.state==="active") b.t=Math.min(b.max,b.t+25);
@@ -1811,7 +1834,7 @@ function update(dt){
       }
     } else if(e.kind==="heyrt"){
       if(e.t<=0){
-        swarm=0; shouts=[];
+        endHeySwarm();
         showBanner("THEY'VE GONE","ok",2.2);
         completeEvent("heyrt",12,"They all wandered off. Nothing was resolved.");
       }
@@ -2062,18 +2085,19 @@ function update(dt){
       } else { s2.moving=false; s2.face=Math.atan2(dy2,dx2); }
     }
     // speech bubbles popping up around you
-    if(Math.random()<dt*2.6 && shouts.length<5){
+    if(Math.random()<dt*3.8 && shouts.length<7){
       const src=staff[Math.floor(Math.random()*staff.length)];
       if(src){
-        const lanes=[-70,-38,-6,26,58,90];
+        const lanes=[-96,-70,-38,-6,26,58,90];
         const used2=shouts.map(function(q){return q.lane;});
         const open2=lanes.filter(function(l){return used2.indexOf(l)<0;});
         if(open2.length){
           shouts.push({x:src.x, y:src.y-24, lane:open2[Math.floor(Math.random()*open2.length)],
                        txt:(function(){
+                         const lines=heyLines();
                          const live=shouts.map(function(q){return q.txt;});
-                         const free=HEY_LINES.filter(function(l){return live.indexOf(l)<0;});
-                         const pool=free.length?free:HEY_LINES;
+                         const free=lines.filter(function(l){return live.indexOf(l)<0;});
+                         const pool=free.length?free:lines;
                          return pool[Math.floor(Math.random()*pool.length)];
                        })(),
                        life:1.9, rise:0});
@@ -2565,9 +2589,7 @@ function update(dt){
   if(act){
     act=false;
     if(carry==="chair"){ dropChair(); }
-    else if(carry==="niv"){
-      drawNIV(player.x+Math.cos(a)*18, player.y+Math.sin(a)*18, a);
-    }
+    else if(carry==="niv"){ /* only goes down at the warmer — see the hold-to-fit-mask check above */ }
     else if(carry==="mcart"){ dropMorgue(); }
     else if(carry==="equip"){ dropEquip(); }
     else if(carry==="cart"||carry==="patient"||carry==="orpatient"){ /* hands full */ }
@@ -6577,20 +6599,22 @@ function draw(){
       g.fillStyle="rgba(0,0,0,.34)";g.beginPath();g.roundRect(-11,-20,24,42,4);g.fill();
       g.fillStyle="#59687A";g.beginPath();g.roundRect(-12,-22,24,42,4);g.fill();
       g.fillStyle="#B9C6D0";g.beginPath();g.roundRect(-9,-19,18,36,3);g.fill();
-      g.fillStyle="#9FC4D6";g.beginPath();g.roundRect(-8,-6,16,22,3);g.fill();
+      g.fillStyle="#9FC4D6";g.beginPath();g.roundRect(-8,-18,16,22,3);g.fill();
       g.strokeStyle=INK;g.lineWidth=1.3;g.beginPath();g.roundRect(-12,-22,24,42,4);g.stroke();
       g.fillStyle="#141C22";
-      g.beginPath();g.arc(-9,18,2.4,0,7);g.fill();g.beginPath();g.arc(9,18,2.4,0,7);g.fill();
+      g.beginPath();g.arc(-9,-20,2.4,0,7);g.fill();g.beginPath();g.arc(9,-20,2.4,0,7);g.fill();
       g.restore();
-      g.save();g.translate(sx2,sy2);g.rotate(a+Math.PI/2);g.rotate(Math.PI);
-      drawFace(0,10,5.6,"#D6A87E","#3A2A20","out");
+      g.save();g.translate(sx2,sy2);g.rotate(a+Math.PI/2);g.scale(1,-1);
+      drawFace(0,-12,5.6,"#D6A87E","#3A2A20","out");
       g.restore();
     }
     else if(carry==="equip"&&eqCarry) drawEquip(player.x+Math.cos(a)*18, player.y+Math.sin(a)*18, eqCarry, a);
     else drawChair(player.x+Math.cos(a)*17, player.y+Math.sin(a)*17, a, carry==="patient");
     // both forearms out to the handles
     const px2=Math.cos(a+Math.PI/2), py2=Math.sin(a+Math.PI/2);
-    const reach=isCart?12:11, spread=isCart?7:6.5;
+    // orpatient: the head end is right next to you now, so a normal reach
+    // puts your hands on the patient's face — grip low, on the near rail
+    const reach=isCart?12:carry==="orpatient"?1:11, spread=isCart?7:carry==="orpatient"?10:6.5;
     [-spread,spread].forEach(function(o){
       const x0=player.x+px2*o*0.85+Math.cos(a)*2, y0=player.y+py2*o*0.85+Math.sin(a)*2;
       const x1=player.x+px2*o+Math.cos(a)*reach,  y1=player.y+py2*o+Math.sin(a)*reach;
@@ -7045,7 +7069,7 @@ function hud(){
     }
     if(e.kind==="heyrt"){
       const f=Math.max(0,e.t/e.max)*100;
-      return '<span class="ev hey"><b>HEY RT</b>everyone wants you · '+Math.ceil(Math.max(0,e.t))+
+      return '<span class="ev hey"><b>'+(role==="RN"?"HEY RN":"HEY RT")+'</b>everyone wants you · '+Math.ceil(Math.max(0,e.t))+
              's<i style="width:'+f+'%"></i></span>';
     }
     if(spark){
