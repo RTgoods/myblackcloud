@@ -36,15 +36,18 @@ const RN_SHORT={IVK:"IV Kit",ABX:"Abx",FLUID:"Fluids",PRESS:"Pressor",FOLEY:"Fol
 Object.keys(RN_TOOLS).forEach(function(k){
   TOOLS[k]=RN_TOOLS[k]; ABBR[k]=RN_ABBR[k]; SHORT[k]=RN_SHORT[k];
 });
-const NAMES=["I. P. Freely","Seymour Butts","Amanda Huggenkiss","Jacques Strap",
-  "Hugh Jass","Bea O\u2019Problem","Al Coholic","Oliver Klozoff","Mike Rotch",
-  "Ivana Tinkle","Anita Bath","Maya Buttreeks","Eura Snotball","Ollie Tabooger",
-  "Heywood U. Cuddleme","I. M. A. Wiener","Drew P. Wiener","Yuri Nator",
-  "Lee Keybum","Tess T. Culls"];
-let namePool=[];
-function nextName(){
-  if(!namePool.length) namePool=NAMES.slice().sort(function(){return Math.random()-0.5;});
-  return namePool.pop();
+const NAMES_F=["Linda Marsh","Carol Jennings","Patricia Nguyen","Deborah Collins",
+  "Susan Alvarez","Diane Foster","Barbara Chen","Rosa Delgado"];
+const NAMES_M=["Robert Hale","Gerald Mitchell","Frank Okafor","Walter Benson",
+  "Dennis Park","Harold Reyes","Martin Kowalski","Leonard Osei"];
+let namePoolF=[], namePoolM=[];
+function nextName(gender){
+  if(gender==="f"){
+    if(!namePoolF.length) namePoolF=NAMES_F.slice().sort(function(){return Math.random()-0.5;});
+    return namePoolF.pop();
+  }
+  if(!namePoolM.length) namePoolM=NAMES_M.slice().sort(function(){return Math.random()-0.5;});
+  return namePoolM.pop();
 }
 let role="RN";                      // set on the start screen, or from the account's saved character
 let playerGender="male";            // from the account's saved character — cosmetic only, no mechanics depend on it
@@ -89,6 +92,7 @@ const BED1_FACE=new Image();
 let bed1FaceReady=false;
 BED1_FACE.onload=function(){bed1FaceReady=true; if(typeof draw==="function") draw();};
 BED1_FACE.src="/images/patient-bed1-face.webp";
+const BED1_GENDER="m";
 // Seven more real portraits for every other bed. Same lazy-load pattern,
 // one Image per file so each can report its own ready state.
 const PATIENT_FACE_FILES=[
@@ -100,6 +104,7 @@ const PATIENT_FACE_FILES=[
   "06-middle-aged-woman-cuts-pained.png",
   "07-older-man-mixed-symptoms.png"
 ];
+const PATIENT_FACE_GENDER=["f","m","f","m","f","f","m"];
 const PATIENT_FACES=PATIENT_FACE_FILES.map(function(file){
   const img=new Image(); img.ready=false;
   img.onload=function(){ img.ready=true; if(typeof draw==="function") draw(); };
@@ -430,7 +435,7 @@ function startLevel(n){
      skin:SKIN[Math.floor(Math.random()*SKIN.length)], col:"#4E6E8E"}
   ];
   blackout=0; blackoutFrom=0; preFlick=0; postFlick=0; eventName=""; eventT=0;
-  namePool=[];
+  namePoolF=[]; namePoolM=[];
   events=[]; evRoll=6+Math.random()*6; partyP=0; dance=0; streamers=[];
   cloudUsed=false; musicCloudActive=false; swarm=0; shouts=[]; powers=[]; friend=null; od=null; odP=0;
   ppe=false; ppeP=0; orPt=null; orP=0; recP=0; ppeWarn=0; ppeUsed=false;
@@ -578,12 +583,13 @@ function admit(b){
   b.plan=d.plan.slice(0,stages);
   b.stage=0; b.careMax=b.plan.length; b.got=[];
   b.p={dx:d.dx, need:b.plan[0].need.slice(), note:b.plan[0].note, sn:b.plan[0].n};
-  b.name=nextName();
   b.skin=SKIN[Math.floor(Math.random()*SKIN.length)];
   b.hair=HAIR[Math.floor(Math.random()*HAIR.length)];
   b.look={ wrap:Math.random()<0.34, seep:Math.random()<0.45,
            patch:Math.random()<0.30, nc:Math.random()<0.40 };
   b.faceIdx = (b.room.id===1) ? null : pickPatientFace(b);
+  const faceGender = b.room.id===1 ? BED1_GENDER : PATIENT_FACE_GENDER[b.faceIdx];
+  b.name=nextName(faceGender);
   b.max=Math.round(d.t*(1-Math.min(.24,(level-1)*0.04)));
   b.t=b.max; b.state="active"; b.active=true;
   admitted++;
