@@ -89,6 +89,37 @@ const BED1_FACE=new Image();
 let bed1FaceReady=false;
 BED1_FACE.onload=function(){bed1FaceReady=true; if(typeof draw==="function") draw();};
 BED1_FACE.src="/images/patient-bed1-face.webp";
+// Seven more real portraits for every other bed. Same lazy-load pattern,
+// one Image per file so each can report its own ready state.
+const PATIENT_FACE_FILES=[
+  "01-middle-aged-woman-sweaty-frightened.png",
+  "02-older-man-bluish-drowsy.png",
+  "03-older-woman-rashy-feverish.png",
+  "04-middle-aged-man-scarred-stoic.png",
+  "05-older-woman-bruised-weary.png",
+  "06-middle-aged-woman-cuts-pained.png",
+  "07-older-man-mixed-symptoms.png"
+];
+const PATIENT_FACES=PATIENT_FACE_FILES.map(function(file){
+  const img=new Image(); img.ready=false;
+  img.onload=function(){ img.ready=true; if(typeof draw==="function") draw(); };
+  img.src="/images/ICU-Patient-Faces-7-512/"+file;
+  return img;
+});
+// Picks a portrait not already worn by another patient currently in a bed,
+// so no two faces on screen at once match; it frees up again as soon as
+// that bed's patient leaves (hasPatient() is defined further down, but
+// this is only ever called after beds exists, well after load).
+function pickPatientFace(forBed){
+  const used={};
+  beds.forEach(function(ob){
+    if(ob!==forBed && hasPatient(ob) && ob.faceIdx!=null) used[ob.faceIdx]=true;
+  });
+  const free=[];
+  for(let i=0;i<PATIENT_FACES.length;i++) if(!used[i]) free.push(i);
+  const pool=free.length?free:PATIENT_FACES.map(function(_,i){return i;});
+  return pool[Math.floor(Math.random()*pool.length)];
+}
 const CAN_KEYS=CANS.map(function(c){return c.k;});
 const CAN_BY={}; CANS.forEach(function(c){ CAN_BY[c.k]=c; });
 CANS.forEach(function(c){ TOOLS[c.k]={n:c.n,s:1}; SHORT[c.k]=c.n.split(" ")[0]; });
@@ -552,6 +583,7 @@ function admit(b){
   b.hair=HAIR[Math.floor(Math.random()*HAIR.length)];
   b.look={ wrap:Math.random()<0.34, seep:Math.random()<0.45,
            patch:Math.random()<0.30, nc:Math.random()<0.40 };
+  b.faceIdx = (b.room.id===1) ? null : pickPatientFace(b);
   b.max=Math.round(d.t*(1-Math.min(.24,(level-1)*0.04)));
   b.t=b.max; b.state="active"; b.active=true;
   admitted++;
@@ -4843,6 +4875,7 @@ function drawEquip(x,y,type,a){
 /* a thumbnail of the patient for the card, drawn once and cached */
 function faceThumb(b){
   if(b.room.id===1) return "/images/patient-bed1-face.webp";
+  if(b.faceIdx!=null && PATIENT_FACES[b.faceIdx].ready) return PATIENT_FACES[b.faceIdx].src;
   const key=(b.name||"")+"|"+b.skin+"|"+b.hair+"|"+(b.look?JSON.stringify(b.look):"")+"|"+
             (b.state==="code"?"out":b.state==="ready"?"ready":(b.t/b.max)<0.24?"out":"worn");
   if(b._thumbKey===key) return b._thumb;
@@ -5224,11 +5257,13 @@ function drawBed(b){
   g.fillStyle=objectMaterial(g,"#D7E1E8",px,py,W,H);g.beginPath();g.roundRect(px+6,py+12,W-12,9,3);g.fill();
 
   if(occ){
-    if(b.room.id===1 && bed1FaceReady){
+    const patientFace=b.room.id===1 ? (bed1FaceReady&&BED1_FACE)
+      : (b.faceIdx!=null && PATIENT_FACES[b.faceIdx].ready ? PATIENT_FACES[b.faceIdx] : null);
+    if(patientFace){
       const fx=px+W/2, fy=py+18, fw=12, fh=15;
       g.save();
       g.beginPath(); g.ellipse(fx,fy,fw/2,fh/2,0,0,Math.PI*2); g.clip();
-      g.drawImage(BED1_FACE, fx-fw/2, fy-fh/2, fw, fh);
+      g.drawImage(patientFace, fx-fw/2, fy-fh/2, fw, fh);
       g.restore();
     } else {
       drawFace(px+W/2, py+18, 6.4, b.skin||"#D6A87E", b.hair||"#3A2A20",
